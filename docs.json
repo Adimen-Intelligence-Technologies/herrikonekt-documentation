@@ -1,100 +1,47 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "almond",
-  "name": "Adimen AI",
+  "name": "Herrikonekt",
+  "description": "Documentación de la app Herrikonekt: qué es, cómo se usa y en qué estado está cada funcionalidad.",
   "colors": {
-    "primary": "#064923",
-    "light": "#76ff61",
-    "dark": "#064923"
+    "primary": "#133212",
+    "light": "#A0F981",
+    "dark": "#133212"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Documentación",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Empezar",
             "pages": [
               "index",
-              "quickstart",
-              "installation"
+              "installation",
+              "primeros-pasos"
             ]
           },
           {
-            "group": "Core Concepts",
+            "group": "Funcionalidades",
             "pages": [
-              "concepts/overview",
-              "concepts/ai-features",
-              "concepts/data-privacy"
-            ]
-          },
-          {
-            "group": "Using the App",
-            "pages": [
-              "guides/account-setup",
-              "guides/onboarding",
-              "guides/main-features",
-              "guides/notifications",
-              "guides/settings"
-            ]
-          },
-          {
-            "group": "Integrations",
-            "pages": [
-              "integrations/overview",
-              "integrations/third-party",
-              "integrations/data-sync"
-            ]
-          },
-          {
-            "group": "Support",
-            "pages": [
-              "support/faq",
-              "support/troubleshooting",
-              "support/contact"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "api/introduction",
-              "api/authentication"
-            ]
-          },
-          {
-            "group": "Endpoints",
-            "pages": [
-              "api/users",
-              "api/sessions",
-              "api/ai-queries",
-              "api/webhooks"
+              "funcionalidades/comercios",
+              "funcionalidades/treboles",
+              "funcionalidades/tu-comercio",
+              "funcionalidades/agenda",
+              "funcionalidades/noticias",
+              "funcionalidades/farmacias",
+              "funcionalidades/esquelas",
+              "funcionalidades/taxis",
+              "funcionalidades/foro",
+              "funcionalidades/favoritos",
+              "funcionalidades/perfil",
+              "funcionalidades/notificaciones"
             ]
           }
         ]
       }
     ]
-  },
-  "navbar": {
-    "links": [
-      { "label": "Support", "href": "mailto:support@adimen.ai" }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Get the App",
-      "href": "https://adimen.ai"
-    }
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/adimen_ai",
-      "linkedin": "https://linkedin.com/company/adimen-ai"
-    }
   },
   "fonts": {
     "family": "Albert Sans"

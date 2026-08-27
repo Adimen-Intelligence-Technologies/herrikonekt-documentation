@@ -1,112 +1,74 @@
 ---
-title: "Herrikonekt: La app que conecta el comercio local y la vida del pueblo"
+title: "Herrikonekt: el comercio local y la vida de tu pueblo en una app"
 sidebarTitle: "Inicio"
-description: "Herrikonekt es la plataforma que acerca el comercio local, la agenda y la actualidad de cada pueblo en una app móvil y a un panel de administración. Esta documentación cubre la arquitectura del backend, su API REST y los recursos de integración."
+description: "Documentación de la app Herrikonekt: qué es, cómo se usa y en qué estado está cada funcionalidad — comercios, tréboles, agenda, noticias, farmacias de guardia, esquelas, taxis y foro, municipio a municipio."
+icon: "house"
 ---
 
-Bienvenido a **Herrikonekt**, la plataforma que conecta el comercio local con la vida de cada pueblo. Herrikonekt reúne en una sola app el directorio de comercios, sus ofertas, la agenda de eventos, las noticias del ayuntamiento, las esquelas, las farmacias de guardia y un foro de la comunidad. Este sitio documenta el **backend**: la API REST que consume la app móvil (React Native) y el panel de administración web.
+**Herrikonekt** reúne en una sola app el comercio de proximidad y la vida de cada pueblo: el directorio de comercios y sus ofertas, la agenda de eventos, las noticias del ayuntamiento, las esquelas, las farmacias de guardia, los taxis y un foro para vecinos. Todo el contenido está filtrado por tu municipio.
 
-<CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Levanta el servidor en local y haz tu primera petición
+Esta documentación explica **qué hace la app, cómo se usa y qué está terminado y qué queda por hacer**.
+
+<CardGroup cols={3}>
+  <Card title="Instalación" icon="download" href="/installation">
+    Descarga Herrikonekt en iOS o Android.
   </Card>
-
-  <Card title="Arquitectura" icon="sitemap" href="/concepts/overview">
-    Next.js 16, MongoDB, Zod v4 y el wrapper de middleware
+  <Card title="Primeros pasos" icon="play" href="/primeros-pasos">
+    Elige tu municipio y recorre la app en dos minutos.
   </Card>
-
-  <Card title="Funcionalidades" icon="mobile" href="/guides/main-features">
-    Comercios, tréboles, foro, notificaciones y más
-  </Card>
-
-  <Card title="API Reference" icon="code" href="/api/introduction">
-    Endpoints, autenticación y esquemas de la API
+  <Card title="Funcionalidades" icon="grid-2" href="/funcionalidades/comercios">
+    Una página por caso de uso, con su estado.
   </Card>
 </CardGroup>
 
-## Qué es Herrikonekt
-
-Herrikonekt digitaliza la vida de los pueblos en torno a su comercio de proximidad. Cada municipio tiene su propio directorio de comercios, sus tipos de negocio, su agenda y sus canales de información oficial, y los vecinos disponen de una app para descubrirlos, seguirlos y apoyarlos.
+## Para quién es
 
 <CardGroup cols={2}>
-  <Card title="Directorio de comercios" icon="store">
-    Fichas con horarios, ubicación (GeoJSON), fotos, descripción multiidioma y ofertas. Los comercios pueden reclamar su ficha (_claims_) o proponer cambios (_sugerencias_), y el equipo puede importar comercios en lote.
+  <Card title="Vecinos" icon="user">
+    Descubren los comercios de su pueblo, los guardan como favoritos y les dan tréboles, y siguen la agenda, las noticias y el foro de su municipio.
   </Card>
 
-  <Card title="Tréboles" icon="clover">
-    Sistema de impulsos de la comunidad: los vecinos reparten tréboles a los comercios que quieren destacar, con recálculo periódico del ranking.
+  <Card title="Comercios" icon="store">
+    Reclaman la ficha de su negocio o piden el alta, y consultan sus datos y solicitudes desde "Mis comercios".
   </Card>
 
-  <Card title="Vida del pueblo" icon="calendar-days">
-    Eventos, noticias del ayuntamiento, esquelas y farmacias de guardia, sincronizados automáticamente desde las fuentes oficiales de cada municipio mediante tareas cron.
+  <Card title="Ayuntamientos" icon="building-columns">
+    Su agenda, sus noticias, sus esquelas y sus farmacias de guardia llegan a la app automáticamente desde las fuentes oficiales.
   </Card>
 
-  <Card title="Comunidad" icon="comments">
-    Foro por pueblo con posts, respuestas, etiquetas, moderación (reportes, fijar posts) y notificaciones push a los dispositivos registrados.
-  </Card>
-
-  <Card title="Favoritos y perfil" icon="heart">
-    Cada usuario guarda sus comercios favoritos, gestiona su perfil y sus claves de API, y recibe notificaciones de la actividad que le interesa.
-  </Card>
-
-  <Card title="Panel de administración" icon="shield-halved">
-    Gestión de comercios, ciudades, tipos de comercio, noticias, foro y usuarios, con historial de cambios auditado en cada escritura.
+  <Card title="Equipo Herrikonekt" icon="shield-halved">
+    Gestiona comercios, municipios, categorías y la moderación del foro desde el panel de administración.
   </Card>
 </CardGroup>
 
-## Arquitectura del backend
+## Cómo está organizada la app
 
-<CardGroup cols={2}>
-  <Card title="Next.js 16 (App Router)" icon="react">
-    Las rutas de API viven en `app/api/<path>/route.ts`. Todo handler pasa por `runMiddleware`, el único punto de entrada: valida la entrada y la salida con Zod, resuelve la sesión, aplica CORS y paginación, mapea los errores a un envelope `{ message, code }` estable y abre MongoDB de forma perezosa.
+La app tiene cinco pestañas y varias pantallas de servicios a las que se llega desde los accesos directos del inicio.
+
+| Pestaña | Contenido |
+| --- | --- |
+| **Inicio** | Buscador, categorías de comercio del municipio, anuncios y comercios destacados, y accesos directos (taxis, comercios, farmacias de guardia, esquelas). |
+| **Mi ciudad** | Directorio completo de comercios del municipio, con filtro por categoría. |
+| **Noticias** | Noticias del ayuntamiento, con favoritos y alertas por categoría. |
+| **Eventos** | Agenda del municipio en vista de semana o de mes. |
+| **Perfil** | Tu cuenta, tus favoritos, las notificaciones del foro, las preferencias y el idioma. |
+
+## Conceptos que se repiten
+
+<CardGroup cols={3}>
+  <Card title="Municipio activo" icon="location-dot">
+    Casi todo el contenido —comercios, noticias, agenda, guardias, foro— es específico de un municipio. Se elige al abrir la app y se cambia desde la cabecera.
   </Card>
 
-  <Card title="MongoDB" icon="database">
-    Acceso perezoso vía `getModels()` en el contexto de la petición: solo se conecta cuando un handler realmente toca la base de datos. Toda escritura valida su entrada con un schema Zod antes de persistir.
+  <Card title="Cuenta opcional" icon="user-lock">
+    La app funciona sin registrarse. Solo hace falta cuenta para favoritos, tréboles, perfil, foro y reclamar un comercio.
   </Card>
 
-  <Card title="Zod v4 como fuente de verdad" icon="shield-check">
-    Los schemas de `lib/schemas/` (uno por dominio) definen las formas de petición y respuesta. El documento OpenAPI se construye a partir de ellos, nunca redefiniéndolos.
-  </Card>
-
-  <Card title="Autenticación con better-auth" icon="key">
-    Cookie de sesión para la app y el panel. Las claves de API solo autentican el endpoint `/api/mcp`; las tareas cron usan `Authorization: Bearer <CRON_SECRET>`.
-  </Card>
-
-  <Card title="OpenAPI 3.1" icon="file-code">
-    Documento mantenido a mano en `lib/openapi/`, servido en `GET /api/openapi.json` y renderizado con Scalar en `GET /api/docs`. Se mantiene sincronizado con `npm run check-openapi`.
-  </Card>
-
-  <Card title="Integración MCP" icon="robot">
-    El endpoint `/api/mcp` expone las operaciones de comercios (crear, editar, autocompletar datos, autogenerar foto, generar enlace de subida) como herramientas MCP para administradores.
-  </Card>
-</CardGroup>
-
-## Primeros pasos
-
-<Steps>
-  <Step title="Clona el repositorio e instala dependencias">
-    `npm install` en la raíz del proyecto `herrikonekt-server`.
-  </Step>
-  <Step title="Configura las variables de entorno">
-    Cadena de conexión de MongoDB, secretos de better-auth y `CRON_SECRET` para las tareas programadas.
-  </Step>
-  <Step title="Arranca el servidor de desarrollo">
-    `npm run dev` levanta Next.js. Ejecuta `npm run lint` y `npm run typecheck` tras cada cambio.
-  </Step>
-  <Step title="Explora la API">
-    Abre `GET /api/docs` para el explorador interactivo, o consulta la [referencia de la API](/api/introduction).
-  </Step>
-</Steps>
-
-## Recursos de soporte
-
-<CardGroup cols={2}>
-  <Card title="FAQ" icon="circle-question" href="/support/faq">
-    Preguntas frecuentes sobre la plataforma
-  </Card>
-
-  <Card title="Solución de problemas" icon="wrench" href="/support/troubleshooting">
-    Diagnostica y resuelve incidencias habituales
+  <Card title="Tres idiomas" icon="language">
+    Castellano, euskera e inglés. Si el ayuntamiento no publica en tu idioma, la app muestra el contenido en el idioma disponible y lo avisa.
   </Card>
 </CardGroup>
+
+<Note>
+  El resumen de **qué está listo, en curso y pendiente** vive en cada página de la sección *Funcionalidades*. Pronto habrá además una página única de *Estado del proyecto*.
+</Note>
