@@ -1,27 +1,36 @@
 ---
 title: "Agenda de eventos del municipio"
 sidebarTitle: "Agenda de eventos"
-description: "La pestaña Eventos muestra la agenda del ayuntamiento en vista de semana o mes, con detalle de cada evento y la opción de añadirlo al calendario."
+description: "La pestaña Eventos: mini-calendario del mes con los días que tienen eventos, lista de próximos eventos, y detalle con fecha, hora, lugar y contenido. La opción de añadir al calendario está pendiente."
 icon: "calendar-days"
 ---
 
-La pestaña **Eventos** recoge la agenda oficial del municipio.
+La pestaña **Eventos** recoge la agenda oficial del municipio activo.
 
 ## Qué puedes hacer
 
-- Ver los eventos en **vista de semana** o **de mes**.
-- Abrir el **detalle** de un evento: fecha, hora, lugar y enlace al original.
-- **Compartir** un evento.
-- **Añadir un evento a tu calendario** (Apple o Google).
+- Ver un **mini-calendario del mes** con un punto en cada día que tiene eventos. Navega entre meses con las flechas.
+- **Tocar un día** para filtrar la lista y ver solo los eventos de esa fecha; toca **Hoy** para quitar el filtro.
+- Ver la lista de **"Próximos eventos"** debajo del calendario, con un contador, y cargar más al hacer scroll.
+- **Tirar para actualizar** la agenda.
+- Abrir el **detalle** de un evento (`/agenda/[id]`):
+  - Imagen, título
+  - Tarjeta con **fecha** (o rango de fechas), **hora** (si el evento la tiene) y **lugar** (si lo tiene)
+  - **Contenido** del evento en HTML enriquecido
+  - Botones **Añadir a calendario** y **Abrir original**, e iconos de **compartir** y **abrir en el navegador** en la cabecera
 
 ## Cómo funciona
 
-- Los eventos se sincronizan automáticamente desde la fuente oficial del ayuntamiento.
-- El contenido se filtra por el **municipio activo**.
-- Si el ayuntamiento no publica en tu idioma, se muestran en el idioma disponible con un aviso.
+- Los eventos se sincronizan automáticamente desde la fuente oficial del ayuntamiento y se **filtran por el municipio activo**.
+- Las fechas se interpretan en zona **Europe/Madrid**; un evento sin hora se trata como "todo el día", un evento multi-día ocupa todos sus días en el calendario.
+- Si el ayuntamiento no publica en tu idioma, la app muestra los eventos en el idioma disponible con una banda de aviso.
 
 ## Estado
 
+<Note>
+  **Listo**: mini-calendario con días marcados, filtro por día, lista de próximos eventos con scroll infinito, pull-to-refresh, detalle con contenido HTML, compartir y abrir original.
+</Note>
+
 <Warning>
-  **Pendiente**: "Añadir a calendario" no funciona todavía en iOS (no abre nada) y en Android depende del navegador. Está previsto reescribirlo para que abra el calendario nativo del dispositivo ya prerelleno.
+  **Pendiente — "Añadir a calendario" no funciona todavía.** La implementación actual genera un archivo `.ics` como enlace `data:` y en iOS no abre nada (fallo silencioso); en Android depende del navegador y de tener sesión de Google. Está previsto reescribirlo con `expo-calendar` para que abra el **editor de calendario nativo** del dispositivo ya prerelleno (Apple o Google, a elección del usuario), tanto en iOS como en Android. Requiere un build nativo nuevo.
 </Warning>

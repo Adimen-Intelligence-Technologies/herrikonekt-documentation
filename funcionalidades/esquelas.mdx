@@ -1,23 +1,29 @@
 ---
 title: "Esquelas"
 sidebarTitle: "Esquelas"
-description: "Las esquelas recientes del municipio, con detalle de cada una y enlace a la esquela original de la funeraria."
+description: "Las esquelas recientes del municipio, con detalle de cada una (edad, ceremonia, fuente) y enlace a la esquela original de la funeraria."
 icon: "flower"
 ---
 
-La pantalla de **Esquelas** (acceso directo desde el inicio) reúne las esquelas recientes del municipio.
+La pantalla de **Esquelas** (acceso directo desde *Mi ciudad*) reúne las esquelas recientes del municipio.
 
 ## Qué puedes hacer
 
-- Ver el listado de **esquelas recientes**.
-- Abrir el **detalle**: edad, datos de la ceremonia y enlace a la esquela original.
-- **Compartir** una esquela.
+- Ver el listado de **esquelas recientes** del municipio, con un contador, y **cargar más** al hacer scroll.
+- **Tirar para actualizar**.
+- Abrir el **detalle** de una esquela (`/obituaries/[id]`):
+  - Datos de la persona y **edad**
+  - Información de la **ceremonia**
+  - **Fuente** (funeraria) y enlace para **ver la esquela original**
+  - Botón **Compartir**
 
 ## Cómo funciona
 
-- Las esquelas son **específicas de cada municipio**: la app necesita saber el tuyo para mostrarlas.
-- Se sincronizan a lo largo del día desde las funerarias.
+- Las esquelas son **específicas de cada municipio**: si la app todavía no sabe tu municipio, muestra un estado "Buscando tu municipio…" y explica que las necesita para mostrarlas.
+- Se sincronizan a lo largo del día desde las funerarias, así que conviene volver a mirar más tarde.
 
 ## Estado
 
-<Note>**Listo**: listado, detalle y enlace al origen.</Note>
+<Note>
+  **Listo**: listado por municipio con contador y scroll infinito, pull-to-refresh, detalle con edad / ceremonia / fuente, compartir y enlace al origen, estados de localización / carga / error / vacío.
+</Note>

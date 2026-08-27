@@ -1,7 +1,7 @@
 ---
 title: "Noticias del ayuntamiento"
 sidebarTitle: "Noticias"
-description: "La pestaña Noticias reúne las publicaciones del ayuntamiento del municipio, con favoritos, filtro por categoría y alertas."
+description: "La pestaña Noticias: el listado de publicaciones del ayuntamiento del municipio, con lectura del artículo completo en tu idioma, compartir y abrir el original."
 icon: "newspaper"
 ---
 
@@ -9,19 +9,26 @@ La pestaña **Noticias** muestra lo que publica el ayuntamiento de tu municipio.
 
 ## Qué puedes hacer
 
-- Leer las noticias, con un bloque de **destacado hoy** y el listado completo.
-- **Filtrar por categoría** o ver **solo favoritos**.
-- **Guardar** una noticia en favoritos.
-- **Compartir por WhatsApp**.
-- Activar **alertas por categoría** para recibir un aviso cuando haya novedades.
-- Abrir la **noticia original** en la web del ayuntamiento.
+- Recorrer el **listado de noticias** (orden por fecha, más recientes arriba), con la antigüedad en formato relativo ("Ahora mismo", "Ayer", "Hace 3 días"…).
+- **Cargar más** al llegar al final del listado y **tirar para actualizar**.
+- Abrir una noticia (`/article`) y leer:
+  - Imagen de portada, título y fecha
+  - El **texto completo** en HTML enriquecido, que se descarga del servidor **en tu idioma** al abrir el artículo
+  - Botón **Compartir** (hoja del sistema) y acceso a la **noticia original** en la web del ayuntamiento
 
 ## Cómo funciona
 
-- Las noticias se sincronizan automáticamente desde la web oficial de cada ayuntamiento.
-- El contenido se filtra por el municipio activo.
-- Si no hay feed en tu idioma, se muestra en el idioma disponible con un aviso.
+- Las noticias se sincronizan automáticamente desde la web oficial de cada ayuntamiento y se **filtran por el municipio activo**.
+- La app **deduplica** versiones del mismo artículo en varios idiomas y muestra la que corresponde a tu idioma.
+- Si el ayuntamiento no publica un feed en tu idioma, se muestra el idioma disponible con una **banda de aviso** (en el listado y en el artículo).
+- El listado se cachea: se ve sin conexión lo último cargado.
 
 ## Estado
 
-<Note>**Listo**: listado, detalle, favoritos, filtros y alertas por categoría.</Note>
+<Note>
+  **Listo**: listado paginado con fecha relativa, pull-to-refresh, artículo con contenido HTML por idioma, deduplicación multiidioma, banda de idioma de reserva, compartir y abrir original.
+</Note>
+
+<Info>
+  **Previsto (textos ya traducidos, UI aún no montada)**: filtro por categoría, marcar noticias como favoritas, "solo favoritos", alertas push por categoría y compartir directo por WhatsApp.
+</Info>

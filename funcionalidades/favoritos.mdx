@@ -1,22 +1,35 @@
 ---
-title: "Favoritos"
+title: "Favoritos: el botón del trébol"
 sidebarTitle: "Favoritos"
-description: "Guarda comercios como favoritos para encontrarlos rápido desde tu perfil."
-icon: "heart"
+description: "Guarda comercios como favoritos con el botón del trébol para tenerlos a mano desde tu perfil. Cómo funciona, qué necesita y cómo se sincroniza."
+icon: "clover"
 ---
 
-Los **favoritos** son los comercios que guardas para tenerlos a mano.
+En Herrikonekt, **guardar un comercio** se hace con el **botón del trébol** (🍀) que aparece flotando en la esquina de cada tarjeta de comercio y en su ficha. Es el equivalente al "corazón" de otras apps: aquí el símbolo de marca es el trébol.
 
 ## Qué puedes hacer
 
-- Marcar o desmarcar un comercio como favorito con el **corazón** de su tarjeta o su ficha.
-- Ver todos tus favoritos desde **Perfil → Mis comercios favoritos**.
+- **Marcar / desmarcar** un comercio tocando el trébol de su tarjeta o de su ficha. El trébol se anima, hace una pequeña vibración y, al marcar, aparece una animación de trébol a pantalla (`CloverOverlay`).
+- **Guardar tantos comercios como quieras**, sin límite y sin ninguna preferencia que activar.
+- **Ver todos tus favoritos** desde **Perfil → Mis comercios favoritos** (`/favorites`). El perfil muestra también el número total.
 
 ## Cómo funciona
 
-- Necesitas **cuenta**. Si tocas el corazón sin sesión, la app te pide iniciar sesión y recuerda tu intención.
-- Los favoritos se guardan en el servidor y te siguen entre dispositivos.
+- Necesitas **cuenta**. Si tocas el trébol sin sesión, la app abre el registro/login, guarda el comercio como "pendiente" y **lo marca automáticamente** en cuanto inicias sesión.
+- Los favoritos se guardan en el servidor (`/favoritos`), así que **te siguen entre dispositivos**.
+- El marcado es **optimista**: se ve al instante y, si el servidor falla, se revierte.
+- Al **cerrar sesión** se limpia la copia local de favoritos.
+
+## Favoritos y "tréboles" no son lo mismo
+
+El botón que hoy ves en la app guarda **favoritos** (ilimitados). Hay un concepto distinto, **[Tréboles](/funcionalidades/treboles)** —un impulso diario y escaso para subir comercios en un ranking del pueblo— que existe en el servidor pero **todavía no está conectado en la app**.
 
 ## Estado
 
-<Note>**Listo**: marcar/desmarcar y listado de favoritos.</Note>
+<Note>
+  **Listo**: marcar / desmarcar desde tarjeta y ficha, animación de recompensa, gate de login con repetición de la acción, listado "Mis favoritos", sincronización por servidor, limpieza al cerrar sesión.
+</Note>
+
+<Info>
+  **Límite conocido**: el listado de favoritos se carga en una sola página de hasta 100; quien supere los 100 favoritos no los verá todos reflejados.
+</Info>

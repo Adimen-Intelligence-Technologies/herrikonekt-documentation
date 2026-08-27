@@ -1,43 +1,53 @@
 ---
 title: "Da de alta o reclama tu comercio"
 sidebarTitle: "Tu comercio"
-description: "Cómo pide un comercio aparecer en Herrikonekt o reclamar la ficha de un negocio que ya está en la app, y cómo sigue el estado de su solicitud."
+description: "Cómo un negocio aparece en Herrikonekt: reclamar la ficha de un comercio que ya está en la app con un documento acreditativo, o pedir el alta de uno nuevo, y seguir el estado desde 'Mis comercios'."
 icon: "briefcase"
 ---
 
-Si tienes un negocio, hay dos caminos según si ya está en la app o no.
+Si tienes un negocio, hay dos caminos según si ya está en la app o no. Ambos empiezan en la pestaña **Perfil** (necesitas cuenta).
 
 ## Reclamar un comercio que ya está en la app
 
+Es el flujo completo, con revisión del equipo.
+
 <Steps>
   <Step title="Abre la ficha del comercio">
-    Búscalo en el directorio y entra en su ficha.
+    Búscalo en el directorio y entra en su ficha. Al final de la ficha hay una tarjeta **"Reclamar este comercio"**.
   </Step>
-  <Step title="Pulsa 'Reclamar este comercio'">
-    Explica por qué eres el titular y adjunta un documento que lo acredite (factura, licencia, alta de autónomo…).
+  <Step title="Rellena el formulario">
+    - **Motivo** (obligatorio): explica por qué eres el titular.
+    - **Documento acreditativo** (obligatorio): adjunta una imagen o un PDF (factura, licencia, alta de autónomo…). El envío se bloquea hasta que los dos campos están completos.
   </Step>
-  <Step title="Espera la revisión">
-    El equipo de Herrikonekt revisa la solicitud y te avisa cuando haya respuesta.
+  <Step title="Envía y espera la revisión">
+    La solicitud llega al equipo de Herrikonekt (`POST /comercios/:id/claim`). Te avisamos cuando haya respuesta.
   </Step>
 </Steps>
 
-Una vez aprobada, pasas a ser **titular** del comercio y aparece en *Mis comercios*.
+Mientras la solicitud está en revisión, la ficha de ese comercio muestra **"Solicitud en revisión"** en vez del botón de reclamar. Si se aprueba, pasas a ser **titular** (rol `owner`) y el comercio aparece en *Mis comercios*.
 
 ## Dar de alta un comercio nuevo
 
-Si tu negocio todavía no está en Herrikonekt, desde **Perfil → ¿Tienes un comercio? → Dar de alta** envías una solicitud con el nombre, la ubicación y el teléfono.
+Si tu negocio todavía no está en Herrikonekt: **Perfil → ¿Tienes un comercio? → Dar de alta**. Se abre un formulario corto (nombre del comercio, ubicación, teléfono, tu email) que **se envía por correo** al equipo.
 
 ## Mis comercios
 
-La pantalla **Mis comercios** (en Perfil) reúne:
+La pantalla **Mis comercios** (`/mis-comercios`, desde Perfil) reúne dos secciones:
 
-- Los comercios de los que ya eres **titular** o gestor.
-- Tus **solicitudes** en curso, con su estado: *pendiente*, *aprobada* o *rechazada* (con el motivo si se rechazó).
+- **Tus comercios** — los comercios de los que ya eres **titular** o **gestor**, con su rol. Tocar uno abre su ficha.
+- **Tus solicitudes** — las reclamaciones en curso, con su estado (**Pendiente**, **Aprobada**, **Rechazada**) y, si fue rechazada, el **motivo del rechazo**.
 
 ## Estado
 
 <Note>
-  **Listo**: reclamar un comercio con documento acreditativo y seguimiento en "Mis comercios".
-
-  **Pendiente**: el alta de un comercio nuevo todavía se envía por correo, no con un formulario dentro de la app.
+  **Listo**
+  - CTA "Reclamar este comercio" en la ficha, con formulario de motivo + documento (imagen/PDF).
+  - Envío real al servidor y detección de solicitud propia pendiente.
+  - Pantalla "Mis comercios" con comercios propios (rol) y seguimiento de solicitudes (estado + motivo de rechazo).
 </Note>
+
+<Warning>
+  **Pendiente**
+  - El **alta de un comercio nuevo** todavía se envía por correo, no con un formulario conectado a la API.
+  - Verificación en dispositivo del envío multipart (imagen/PDF) en iOS y Android — corregido un problema de formato de archivo, falta reconfirmar.
+</Warning>

@@ -1,32 +1,55 @@
 ---
-title: "Comercios: directorio, ficha y ofertas"
+title: "Comercios: directorio, ficha, mapa y ofertas"
 sidebarTitle: "Comercios"
-description: "El directorio de comercios de cada municipio: búsqueda, categorías, ficha de detalle, mapa, ofertas y reportes."
+description: "El directorio de comercios de proximidad de cada municipio: buscador, tipos de comercio, ficha de detalle con contacto y horario, mapa con 'Cómo llegar', anuncios y reportes."
 icon: "store"
 ---
 
-El directorio de comercios es el corazón de Herrikonekt. Cada municipio tiene su propia lista de negocios de proximidad.
+El directorio de comercios es el corazón de Herrikonekt. Cada municipio tiene su propia lista de negocios de proximidad, sus **tipos de comercio** y sus **anuncios**.
+
+## Dónde se ve
+
+| Sitio | Qué muestra |
+| --- | --- |
+| **Inicio** | Buscador, carrusel de tipos de comercio del municipio, anuncios destacados y el listado de comercios de la categoría seleccionada (o todos), con scroll infinito. |
+| **Mi ciudad → Comercios** (`/comercios`) | El directorio completo, con la misma cabecera de buscador + carrusel de categorías + tarjetas. |
+| **Ficha de comercio** (`/business/[id]`) | El detalle de un comercio concreto. |
 
 ## Qué puedes hacer
 
-- **Buscar** un comercio o una categoría desde el inicio.
-- **Explorar por categoría** (los "tipos de comercio" del municipio) desde el carrusel del inicio o desde la pestaña *Mi ciudad*.
-- **Ver la ficha** de un comercio: horario, contacto (teléfono, email, web, redes), descripción, fotos, servicios y ubicación.
-- **Cómo llegar**: abre la dirección en Apple Maps o Google Maps.
-- **Guardar como favorito** y **dar un trébol** desde la propia tarjeta.
-- **Reportar** un comercio si ha cerrado o tiene datos erróneos.
-- Ver los **anuncios y ofertas** destacados del municipio.
+- **Buscar** por nombre de comercio o por categoría desde la barra de búsqueda (con sugerencias mientras escribes).
+- **Filtrar por tipo de comercio** tocando una bolita del carrusel. Cada municipio define sus propios tipos; si falta el de por defecto, la app cae al primero disponible.
+- **Abrir la ficha** de un comercio y ver:
+  - Nombre, foto principal y galería de **fotos**
+  - **Horario** por días de la semana
+  - **Contacto**: llamar, email, web, Facebook, Instagram
+  - **Descripción** (en tu idioma cuando el comercio la tiene traducida) y lista de **servicios** / tratamientos
+  - Distintivo **PREMIUM** si el comercio lo tiene
+- **Ver el mapa** del comercio (banda con un thumbnail centrado en su ubicación) y pulsar **Cómo llegar** para abrir Apple Maps / Google Maps con la ruta.
+- **Guardar el comercio como favorito** o **darle un trébol** con el botón del trébol de la tarjeta (ver [Favoritos](/funcionalidades/favoritos)).
+- **Reportar** el comercio ("¿Este comercio ya no existe o hay datos erróneos?") con un formulario de 2 pasos que se envía por correo.
+- **Reclamar** el comercio si eres el titular (ver [Tu comercio](/funcionalidades/tu-comercio)).
+- Ver los **anuncios / ofertas** del municipio en el carrusel de Inicio y abrir el detalle de cada uno.
 
 ## Cómo funciona
 
-- La lista y las categorías se cargan del servidor y se filtran por el **municipio activo**.
-- El listado está paginado y cacheado: si abres la app sin conexión, ves lo último que se cargó.
-- La descripción aparece en tu idioma cuando el comercio la tiene traducida.
+- La lista de comercios, los tipos de comercio y los anuncios se cargan del servidor y se **filtran por el municipio activo**. Los anuncios llegan de un endpoint global y se cruzan en el cliente con la ciudad de cada comercio.
+- El listado está **paginado** (scroll infinito) y **cacheado**: si abres la app sin conexión ves lo último que se cargó. "Tirar para actualizar" recarga la primera página.
+- Los datos de un comercio (horario, fotos, contacto, ubicación GeoJSON) los mantiene el equipo de Herrikonekt en el panel; parte se puede autocompletar con las herramientas MCP.
 
 ## Estado
 
 <Note>
-  **Listo**: directorio, búsqueda, filtro por categoría, ficha de detalle, ofertas, favoritos y reportes.
-
-  **En curso**: fondo de mapa en las tarjetas y mapa interactivo en la ficha de detalle.
+  **Listo**
+  - Buscador con sugerencias, filtro por tipo de comercio, listado paginado y cacheado.
+  - Ficha de detalle completa: horario, contacto, fotos, descripción multiidioma, servicios, distintivo premium.
+  - Banda de mapa con thumbnail + botón "Cómo llegar" (Apple/Google Maps).
+  - Anuncios / ofertas por municipio.
+  - Reporte de comercio (formulario → correo).
 </Note>
+
+<Warning>
+  **Depende del servidor**
+  - El mapa solo aparece cuando el comercio tiene coordenadas cargadas; si no, la ficha muestra solo la dirección en texto.
+  - El estilo de mapa de marca todavía usa un estilo público de reserva hasta que se aloje el definitivo.
+</Warning>

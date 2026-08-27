@@ -1,31 +1,37 @@
 ---
-title: "Tréboles: impulsar a un comercio"
+title: "Tréboles: el impulso diario al comercio local (previsto)"
 sidebarTitle: "Tréboles"
-description: "El trébol es el impulso diario de la comunidad a un comercio del pueblo. Cómo se usa y qué hace falta activar."
-icon: "clover"
+description: "El trébol como impulso diario y escaso para subir comercios en el ranking de su pueblo: qué es, en qué se diferencia de un favorito y por qué todavía no está en la app."
+icon: "seedling"
 ---
 
-El **trébol** es la forma que tienen los vecinos de dar un empujón a los comercios que quieren destacar en su pueblo.
+<Warning>
+  **Estado: previsto, no disponible en la app.** Hoy el botón del trébol de las tarjetas guarda [favoritos](/funcionalidades/favoritos) (ilimitados). El sistema de "trébol impulso" que describe esta página existe en el servidor pero **aún no está conectado** en la app.
+</Warning>
 
-## Qué puedes hacer
+## La idea
 
-- Dar **un trébol al día** al comercio que elijas, desde su tarjeta o su ficha.
-- Ver cuántos impulsos ha recibido un comercio en los últimos días.
+El **trébol** está pensado como la forma en que los vecinos dan un empujón a los comercios que quieren destacar en su pueblo: un **impulso diario y escaso** que alimenta un ranking del municipio.
 
-## Cómo funciona
+| | Favorito (hoy) | Trébol impulso (previsto) |
+| --- | --- | --- |
+| Cuántos | Ilimitados | **Uno al día por persona**, para todo el usuario |
+| Se puede quitar | Sí | No |
+| Para qué sirve | Encontrar el comercio rápido | Subir el comercio en el ranking del pueblo |
+| Requisitos | Cuenta | Cuenta **+ activar los tréboles** en el perfil (opt-in) |
 
-- Necesitas **cuenta** y tener **activados los tréboles** en tu perfil (opt-in). Si no, la app te lleva a activarlo.
-- Es **un trébol por día y por persona**, para todo el usuario (no uno por comercio).
-- No se puede "quitar" un trébol ya dado.
-- El impulso se guarda en el servidor y cuenta para el ranking del municipio.
+## Qué falta para activarlo
 
-## Tréboles y favoritos no son lo mismo
+El contrato del servidor ya está definido (`POST /treboles/impulso`, `GET /treboles/estado`, `GET /treboles/mis-impulsos`, opt-in vía `PATCH /mi-perfil`). En la app queda:
 
-- **Favorito** (corazón): guardas el comercio para encontrarlo rápido. Tantos como quieras.
-- **Trébol**: impulso diario y limitado que sube al comercio en su pueblo.
+- Cambiar el modelo interno de "me gusta ilimitado" a "un trébol al día, no reversible".
+- Añadir en el **perfil** el interruptor de "activar los tréboles" (opt-in), obligatorio antes del primer impulso.
+- Adaptar el botón del trébol a sus tres estados: disponible, ya usado hoy en este comercio, sin trébol hoy.
+- Mostrar feedback cuando el impulso falla o cuando falta el opt-in.
+- Prueba contra el servidor real.
 
 ## Estado
 
-<Note>
-  **En curso**: la conexión con el servidor de tréboles (rutas reales y opt-in) está casi terminada. El modelo pasó de "me gusta ilimitado" a "un trébol al día, no reversible".
-</Note>
+<Warning>
+  **Pendiente**: conexión completa con el servidor de tréboles y la UI de opt-in en el perfil. Verificación en dispositivo aún no hecha.
+</Warning>

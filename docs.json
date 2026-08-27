@@ -26,6 +26,7 @@
             "group": "Funcionalidades",
             "pages": [
               "funcionalidades/comercios",
+              "funcionalidades/favoritos",
               "funcionalidades/treboles",
               "funcionalidades/tu-comercio",
               "funcionalidades/agenda",
@@ -34,9 +35,14 @@
               "funcionalidades/esquelas",
               "funcionalidades/taxis",
               "funcionalidades/foro",
-              "funcionalidades/favoritos",
               "funcionalidades/perfil",
               "funcionalidades/notificaciones"
+            ]
+          },
+          {
+            "group": "Proyecto",
+            "pages": [
+              "funcionalidades/estado"
             ]
           }
         ]

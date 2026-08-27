@@ -1,23 +1,31 @@
 ---
 title: "Taxis del municipio"
 sidebarTitle: "Taxis"
-description: "Los taxis disponibles en tu municipio, con llamada directa y cómo llegar a la parada."
+description: "Los taxis del municipio en tarjetas con llamada directa ('Pedir taxi') y ruta a la parada. Depende de que el municipio tenga configurado el tipo 'taxi' en el servidor."
 icon: "taxi"
 ---
 
-La pantalla de **Taxis** (acceso directo desde el inicio) lista los taxis del municipio.
+La pantalla de **Taxis** (acceso directo desde *Mi ciudad*) lista los taxis del municipio.
 
 ## Qué puedes hacer
 
-- Ver los taxis del municipio y si están **disponibles** ahora.
-- **Llamar** a un taxi con un toque.
-- Ver **cómo llegar** a su parada.
+- Ver los **taxis del municipio** en tarjetas con foto, nombre y dirección.
+- **Pedir taxi**: el botón de la tarjeta abre el marcador del teléfono con el número del taxi.
+- Ver la **ruta a la parada** cuando el taxi tiene ubicación (abre el mapa del sistema).
+- Guardar un taxi con el **trébol** (favorito), igual que un comercio.
 
 ## Cómo funciona
 
-- Los datos son propios de cada municipio.
-- Puedes usar tu ubicación para ajustar el municipio.
+- Los taxis se modelan como **comercios de un tipo especial** ("taxi") dentro del directorio del municipio.
+- Si el municipio **no tiene configurado ese tipo** en el servidor, la pantalla lo indica ("Aún no hay tipo de taxis configurado en el servidor").
+- Se puede usar la ubicación para ajustar el municipio.
 
 ## Estado
 
-<Note>**Listo**: listado, disponibilidad, llamada y ruta.</Note>
+<Note>
+  **Listo**: listado por municipio, "Pedir taxi" (llamada), ruta a la parada, botón de favorito, estados de carga / error / vacío y aviso cuando el tipo no está configurado.
+</Note>
+
+<Info>
+  **Nota**: no hay pantalla de detalle de un taxi; tocar la tarjeta no abre nada más. La acción principal es llamar.
+</Info>

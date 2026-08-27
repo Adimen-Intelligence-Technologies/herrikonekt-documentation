@@ -1,13 +1,13 @@
 ---
 title: "Herrikonekt: el comercio local y la vida de tu pueblo en una app"
 sidebarTitle: "Inicio"
-description: "Documentación de la app Herrikonekt: qué es, cómo se usa y en qué estado está cada funcionalidad — comercios, tréboles, agenda, noticias, farmacias de guardia, esquelas, taxis y foro, municipio a municipio."
+description: "Documentación de la app Herrikonekt: qué es, cómo se usa pantalla a pantalla, y en qué estado está cada funcionalidad — comercios, favoritos, agenda, noticias, farmacias de guardia, esquelas, taxis y foro, municipio a municipio."
 icon: "house"
 ---
 
 **Herrikonekt** reúne en una sola app el comercio de proximidad y la vida de cada pueblo: el directorio de comercios y sus ofertas, la agenda de eventos, las noticias del ayuntamiento, las esquelas, las farmacias de guardia, los taxis y un foro para vecinos. Todo el contenido está filtrado por tu municipio.
 
-Esta documentación explica **qué hace la app, cómo se usa y qué está terminado y qué queda por hacer**.
+Esta documentación explica **qué hace la app, cómo se usa y qué está terminado y qué queda por hacer**, funcionalidad por funcionalidad.
 
 <CardGroup cols={3}>
   <Card title="Instalación" icon="download" href="/installation">
@@ -25,50 +25,66 @@ Esta documentación explica **qué hace la app, cómo se usa y qué está termin
 
 <CardGroup cols={2}>
   <Card title="Vecinos" icon="user">
-    Descubren los comercios de su pueblo, los guardan como favoritos y les dan tréboles, y siguen la agenda, las noticias y el foro de su municipio.
+    Descubren los comercios de su pueblo, los guardan como favoritos, y siguen la agenda, las noticias, las esquelas, las farmacias de guardia y el foro de su municipio.
   </Card>
 
   <Card title="Comercios" icon="store">
-    Reclaman la ficha de su negocio o piden el alta, y consultan sus datos y solicitudes desde "Mis comercios".
+    Reclaman la ficha de su negocio con un documento acreditativo o piden el alta, y siguen el estado de su solicitud desde "Mis comercios".
   </Card>
 
   <Card title="Ayuntamientos" icon="building-columns">
-    Su agenda, sus noticias, sus esquelas y sus farmacias de guardia llegan a la app automáticamente desde las fuentes oficiales.
+    Su agenda, sus noticias y sus esquelas llegan a la app automáticamente desde las fuentes oficiales; las farmacias de guardia, del Colegio de Farmacéuticos de Gipuzkoa.
   </Card>
 
   <Card title="Equipo Herrikonekt" icon="shield-halved">
-    Gestiona comercios, municipios, categorías y la moderación del foro desde el panel de administración.
+    Gestiona comercios, municipios, tipos de comercio, noticias y la moderación del foro desde el panel de administración y las herramientas MCP.
   </Card>
 </CardGroup>
 
-## Cómo está organizada la app
+## Las pantallas de la app
 
-La app tiene cinco pestañas y varias pantallas de servicios a las que se llega desde los accesos directos del inicio.
+La app tiene **cinco pestañas** en la barra inferior y varias **pantallas de servicios** a las que se llega desde los accesos directos de "Mi ciudad".
 
-| Pestaña | Contenido |
+| Pestaña | Qué contiene |
 | --- | --- |
-| **Inicio** | Buscador, categorías de comercio del municipio, anuncios y comercios destacados, y accesos directos (taxis, comercios, farmacias de guardia, esquelas). |
-| **Mi ciudad** | Directorio completo de comercios del municipio, con filtro por categoría. |
-| **Noticias** | Noticias del ayuntamiento, con favoritos y alertas por categoría. |
-| **Eventos** | Agenda del municipio en vista de semana o de mes. |
-| **Perfil** | Tu cuenta, tus favoritos, las notificaciones del foro, las preferencias y el idioma. |
+| **Inicio** | Cabecera con saludo, municipio activo y selector de idioma · buscador de comercios y categorías · carrusel de "tipos de comercio" del municipio · **anuncios destacados** · listado de comercios (filtrado por la categoría elegida, con scroll infinito). |
+| **Mi ciudad** | Portada del municipio (`TownHero`) + rejilla de **accesos directos**: Taxis, Comercios, Farmacias de guardia, Esquelas y Foro. |
+| **Noticias** | Listado de noticias del ayuntamiento, con scroll infinito y "tirar para actualizar". |
+| **Eventos** | Mini-calendario del mes con puntos en los días con eventos + lista de "Próximos eventos". |
+| **Perfil** | Sin sesión: pantalla de bienvenida + registro/login. Con sesión: tu perfil, favoritos, notificaciones del foro, "Mis comercios", opt-out de analítica y cerrar sesión. |
+
+<Note>
+  El **directorio completo de comercios** (`/comercios`) se abre desde el acceso directo "Comercios" o desde "Ver todos" en Inicio; no es una pestaña.
+</Note>
 
 ## Conceptos que se repiten
 
 <CardGroup cols={3}>
   <Card title="Municipio activo" icon="location-dot">
-    Casi todo el contenido —comercios, noticias, agenda, guardias, foro— es específico de un municipio. Se elige al abrir la app y se cambia desde la cabecera.
+    Comercios, noticias, agenda, guardias, esquelas, taxis y foro son **específicos de un municipio**. Se elige al abrir la app (por ubicación o buscándolo) y se cambia tocando el nombre del pueblo en la cabecera de Inicio.
   </Card>
 
   <Card title="Cuenta opcional" icon="user-lock">
-    La app funciona sin registrarse. Solo hace falta cuenta para favoritos, tréboles, perfil, foro y reclamar un comercio.
+    La app funciona sin registrarse. Solo hace falta cuenta para **favoritos, perfil, foro, notificaciones y reclamar un comercio**. Cuando una acción la necesita, la app lo pide en ese momento y recuerda tu intención tras iniciar sesión.
   </Card>
 
   <Card title="Tres idiomas" icon="language">
-    Castellano, euskera e inglés. Si el ayuntamiento no publica en tu idioma, la app muestra el contenido en el idioma disponible y lo avisa.
+    Castellano, euskera e inglés. Se cambia desde el botón de idioma de la cabecera. Si el ayuntamiento no publica noticias o agenda en tu idioma, la app muestra el contenido disponible y lo avisa con una banda.
+  </Card>
+
+  <Card title="Funciona sin conexión (parcial)" icon="wifi-slash">
+    Los listados que ya se cargaron una vez (comercios, noticias…) se guardan en caché local y se ven sin conexión; las acciones que escriben en el servidor necesitan red.
+  </Card>
+
+  <Card title="Contenido oficial automático" icon="rss">
+    Noticias, agenda y esquelas se sincronizan solas desde las webs oficiales de cada municipio mediante tareas programadas. Las farmacias de guardia vienen del Colegio de Farmacéuticos de Gipuzkoa.
+  </Card>
+
+  <Card title="Diseño por secciones" icon="palette">
+    Cada área (eventos, esquelas, farmacias, perfil, foro) tiene su propia identidad de color sobre la base de marca verde/crema.
   </Card>
 </CardGroup>
 
 <Note>
-  El resumen de **qué está listo, en curso y pendiente** vive en cada página de la sección *Funcionalidades*. Pronto habrá además una página única de *Estado del proyecto*.
+  El resumen transversal de **qué está listo, en curso y pendiente** vive en cada página de *Funcionalidades*, en la sección "Estado". Pronto habrá además una página única de *Estado del proyecto*.
 </Note>

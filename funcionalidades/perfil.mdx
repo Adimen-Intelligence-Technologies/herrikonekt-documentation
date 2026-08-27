@@ -1,31 +1,46 @@
 ---
 title: "Perfil y cuenta"
 sidebarTitle: "Perfil y cuenta"
-description: "La pestaña Perfil: cuenta, inicio de sesión, datos personales, favoritos, notificaciones del foro, idioma y privacidad."
+description: "La pestaña Perfil: registro y login (email, Apple, Google), edición del perfil, acceso a favoritos, notificaciones del foro y 'Mis comercios', opt-out de analítica y cerrar sesión."
 icon: "user"
 ---
 
-La pestaña **Perfil** reúne tu cuenta y tus ajustes.
+La pestaña **Perfil** es la cuenta del usuario. La app funciona sin ella; solo hace falta para favoritos, foro, notificaciones y reclamar comercios.
 
-## Qué puedes hacer
+## Sin sesión
 
-- **Iniciar sesión o registrarte** con email y contraseña, con Apple o con Google.
-- Editar tu **perfil**: nombre, foto, teléfono y ubicación.
-- Ver tus **comercios favoritos** y las **notificaciones del foro**.
-- Acceder a **Mis comercios** (titularidad y solicitudes).
-- Cambiar el **idioma** de la app.
-- Activar o desactivar el envío de **datos de uso** (analítica).
-- **Cerrar sesión** (con confirmación).
+Una pantalla de bienvenida ("¡Hooola! ¿Eres nuevo en el barrio?") con dos botones: **Iniciar sesión** y **Crear cuenta**. Ambos llevan al formulario de autenticación:
 
-## Cómo funciona
+- **Email y contraseña** (contraseña mínima de 8 caracteres)
+- **Continuar con Apple**
+- **Continuar con Google**
 
-- La cuenta es **opcional**: la app funciona sin ella.
-- Al cerrar sesión se limpia la caché local de la app.
+Los errores se muestran de forma clara (credenciales incorrectas, email ya registrado, sin conexión…).
+
+## Con sesión
+
+| Elemento | Qué hace |
+| --- | --- |
+| **Cabecera de perfil** | Foto (editable con cámara o galería), nombre y datos. |
+| **Miembro desde** | Fecha de alta de la cuenta. |
+| **Mis comercios favoritos** | Abre el listado de [favoritos](/funcionalidades/favoritos) (muestra el total). |
+| **Notificaciones del foro** | Abre las [notificaciones](/funcionalidades/notificaciones) (muestra el nº sin leer). |
+| **Editar perfil y preferencias** | Cambiar nombre, foto, teléfono y ubicación. También tiene un botón de cerrar sesión. |
+| **¿Tienes un comercio?** | Botones **Dar de alta** y **Reclamar** → lleva a [Tu comercio](/funcionalidades/tu-comercio) / "Mis comercios". |
+| **Enviar mensaje** | Feedback al equipo ("¿has encontrado un error?"). |
+| **Compartir datos de uso** | Interruptor de **opt-out de analítica** (solo aparece si la analítica está configurada). |
+| **Cerrar sesión** | Fila propia, con confirmación (`Alert` destructivo). Al confirmar, se limpia la caché local y vuelves a la pantalla de bienvenida. |
+
+<Note>
+  El **idioma** de la app no se cambia desde Perfil, sino desde el **botón de idioma de la cabecera** (en Inicio). Ver [Primeros pasos](/primeros-pasos).
+</Note>
 
 ## Estado
 
 <Note>
-  **Listo**: nueva pantalla de perfil, edición, cerrar sesión visible, idioma y opt-out de analítica.
-
-  **Pendiente**: el inicio de sesión con **Google en iPhone** falla ("failed to determine clientID") y está pendiente de configurar.
+  **Listo**: pantalla de bienvenida + auth (email/contraseña, Apple, Google) con errores mapeados, perfil autenticado con foto editable, edición de nombre/teléfono/ubicación, accesos a favoritos y notificaciones, CTA de comercio, feedback, opt-out de analítica (PostHog), y **cerrar sesión visible con confirmación** (antes solo estaba escondido en "Editar perfil").
 </Note>
+
+<Warning>
+  **Pendiente — Google Sign-In en iPhone.** En iOS falla con `failed to determine clientID` porque falta configurar el `iosClientId` de Google (client ID de iOS, variable de entorno y, si aplica, URL scheme en `app.json`). En Android funciona. Requiere un build nativo nuevo.
+</Warning>
