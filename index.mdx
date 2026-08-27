@@ -1,0 +1,112 @@
+---
+title: "Herrikonekt: La app que conecta el comercio local y la vida del pueblo"
+sidebarTitle: "Inicio"
+description: "Herrikonekt es la plataforma que acerca el comercio local, la agenda y la actualidad de cada pueblo en una app móvil y a un panel de administración. Esta documentación cubre la arquitectura del backend, su API REST y los recursos de integración."
+---
+
+Bienvenido a **Herrikonekt**, la plataforma que conecta el comercio local con la vida de cada pueblo. Herrikonekt reúne en una sola app el directorio de comercios, sus ofertas, la agenda de eventos, las noticias del ayuntamiento, las esquelas, las farmacias de guardia y un foro de la comunidad. Este sitio documenta el **backend**: la API REST que consume la app móvil (React Native) y el panel de administración web.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Levanta el servidor en local y haz tu primera petición
+  </Card>
+
+  <Card title="Arquitectura" icon="sitemap" href="/concepts/overview">
+    Next.js 16, MongoDB, Zod v4 y el wrapper de middleware
+  </Card>
+
+  <Card title="Funcionalidades" icon="mobile" href="/guides/main-features">
+    Comercios, tréboles, foro, notificaciones y más
+  </Card>
+
+  <Card title="API Reference" icon="code" href="/api/introduction">
+    Endpoints, autenticación y esquemas de la API
+  </Card>
+</CardGroup>
+
+## Qué es Herrikonekt
+
+Herrikonekt digitaliza la vida de los pueblos en torno a su comercio de proximidad. Cada municipio tiene su propio directorio de comercios, sus tipos de negocio, su agenda y sus canales de información oficial, y los vecinos disponen de una app para descubrirlos, seguirlos y apoyarlos.
+
+<CardGroup cols={2}>
+  <Card title="Directorio de comercios" icon="store">
+    Fichas con horarios, ubicación (GeoJSON), fotos, descripción multiidioma y ofertas. Los comercios pueden reclamar su ficha (_claims_) o proponer cambios (_sugerencias_), y el equipo puede importar comercios en lote.
+  </Card>
+
+  <Card title="Tréboles" icon="clover">
+    Sistema de impulsos de la comunidad: los vecinos reparten tréboles a los comercios que quieren destacar, con recálculo periódico del ranking.
+  </Card>
+
+  <Card title="Vida del pueblo" icon="calendar-days">
+    Eventos, noticias del ayuntamiento, esquelas y farmacias de guardia, sincronizados automáticamente desde las fuentes oficiales de cada municipio mediante tareas cron.
+  </Card>
+
+  <Card title="Comunidad" icon="comments">
+    Foro por pueblo con posts, respuestas, etiquetas, moderación (reportes, fijar posts) y notificaciones push a los dispositivos registrados.
+  </Card>
+
+  <Card title="Favoritos y perfil" icon="heart">
+    Cada usuario guarda sus comercios favoritos, gestiona su perfil y sus claves de API, y recibe notificaciones de la actividad que le interesa.
+  </Card>
+
+  <Card title="Panel de administración" icon="shield-halved">
+    Gestión de comercios, ciudades, tipos de comercio, noticias, foro y usuarios, con historial de cambios auditado en cada escritura.
+  </Card>
+</CardGroup>
+
+## Arquitectura del backend
+
+<CardGroup cols={2}>
+  <Card title="Next.js 16 (App Router)" icon="react">
+    Las rutas de API viven en `app/api/<path>/route.ts`. Todo handler pasa por `runMiddleware`, el único punto de entrada: valida la entrada y la salida con Zod, resuelve la sesión, aplica CORS y paginación, mapea los errores a un envelope `{ message, code }` estable y abre MongoDB de forma perezosa.
+  </Card>
+
+  <Card title="MongoDB" icon="database">
+    Acceso perezoso vía `getModels()` en el contexto de la petición: solo se conecta cuando un handler realmente toca la base de datos. Toda escritura valida su entrada con un schema Zod antes de persistir.
+  </Card>
+
+  <Card title="Zod v4 como fuente de verdad" icon="shield-check">
+    Los schemas de `lib/schemas/` (uno por dominio) definen las formas de petición y respuesta. El documento OpenAPI se construye a partir de ellos, nunca redefiniéndolos.
+  </Card>
+
+  <Card title="Autenticación con better-auth" icon="key">
+    Cookie de sesión para la app y el panel. Las claves de API solo autentican el endpoint `/api/mcp`; las tareas cron usan `Authorization: Bearer <CRON_SECRET>`.
+  </Card>
+
+  <Card title="OpenAPI 3.1" icon="file-code">
+    Documento mantenido a mano en `lib/openapi/`, servido en `GET /api/openapi.json` y renderizado con Scalar en `GET /api/docs`. Se mantiene sincronizado con `npm run check-openapi`.
+  </Card>
+
+  <Card title="Integración MCP" icon="robot">
+    El endpoint `/api/mcp` expone las operaciones de comercios (crear, editar, autocompletar datos, autogenerar foto, generar enlace de subida) como herramientas MCP para administradores.
+  </Card>
+</CardGroup>
+
+## Primeros pasos
+
+<Steps>
+  <Step title="Clona el repositorio e instala dependencias">
+    `npm install` en la raíz del proyecto `herrikonekt-server`.
+  </Step>
+  <Step title="Configura las variables de entorno">
+    Cadena de conexión de MongoDB, secretos de better-auth y `CRON_SECRET` para las tareas programadas.
+  </Step>
+  <Step title="Arranca el servidor de desarrollo">
+    `npm run dev` levanta Next.js. Ejecuta `npm run lint` y `npm run typecheck` tras cada cambio.
+  </Step>
+  <Step title="Explora la API">
+    Abre `GET /api/docs` para el explorador interactivo, o consulta la [referencia de la API](/api/introduction).
+  </Step>
+</Steps>
+
+## Recursos de soporte
+
+<CardGroup cols={2}>
+  <Card title="FAQ" icon="circle-question" href="/support/faq">
+    Preguntas frecuentes sobre la plataforma
+  </Card>
+
+  <Card title="Solución de problemas" icon="wrench" href="/support/troubleshooting">
+    Diagnostica y resuelve incidencias habituales
+  </Card>
+</CardGroup>

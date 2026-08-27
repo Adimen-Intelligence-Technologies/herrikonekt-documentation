@@ -1,0 +1,103 @@
+{
+  "projectType": "saas",
+  "projectName": "Adimen AI",
+  "projectDescription": "An AI-powered mobile application that provides intelligent assistance and automation features for end users.",
+  "theme": "almond",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/overview",
+              "concepts/ai-features",
+              "concepts/data-privacy"
+            ]
+          },
+          {
+            "group": "Using the App",
+            "pages": [
+              "guides/account-setup",
+              "guides/onboarding",
+              "guides/main-features",
+              "guides/notifications",
+              "guides/settings"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/overview",
+              "integrations/third-party",
+              "integrations/data-sync"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "support/faq",
+              "support/troubleshooting",
+              "support/contact"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/introduction",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api/users",
+              "api/sessions",
+              "api/ai-queries",
+              "api/webhooks"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "AI-powered intelligent assistant",
+    "Personalized recommendations",
+    "Real-time data sync across devices",
+    "Push notifications and alerts",
+    "Third-party integrations",
+    "Privacy-first data handling",
+    "Offline mode support",
+    "REST API for developers"
+  ],
+  "publicApiSurface": [
+    "POST /api/v1/auth/login",
+    "POST /api/v1/auth/register",
+    "GET /api/v1/users/me",
+    "POST /api/v1/ai/query",
+    "GET /api/v1/sessions",
+    "POST /api/v1/sessions",
+    "DELETE /api/v1/sessions/{id}",
+    "POST /api/v1/webhooks",
+    "GET /api/v1/webhooks",
+    "DELETE /api/v1/webhooks/{id}"
+  ]
+}

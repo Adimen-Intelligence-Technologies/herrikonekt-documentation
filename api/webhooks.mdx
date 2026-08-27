@@ -1,0 +1,141 @@
+---
+title: "Adimen AI Webhooks API: Real-Time Event Notifications"
+sidebarTitle: "Webhooks"
+description: "Register webhook endpoints to receive real-time event notifications from Adimen AI when automations trigger, sessions end, or integrations update."
+---
+
+Webhooks let you receive real-time HTTP POST notifications from Adimen AI when specific events occur in your account. Instead of polling the API for updates, register an HTTPS endpoint and Adimen AI will push event payloads to you the moment they happen.
+
+## Available Events
+
+| Event | Description |
+|---|---|
+| `automation.triggered` | An automation rule fired based on a configured condition. |
+| `session.expired` | A session exceeded 24 hours of inactivity and has expired. |
+| `integration.connected` | A new third-party service was successfully connected to your account. |
+| `integration.disconnected` | A previously connected service was disconnected from your account. |
+| `query.completed` | An AI query finished processing. Only delivered for async queries. |
+
+---
+
+## POST /webhooks
+
+Register a new webhook endpoint to start receiving event notifications.
+
+**Request Body**
+
+<ParamField body="url" type="string" required>
+  The HTTPS URL of your endpoint that will receive event payloads. Must use `https://` — HTTP URLs are rejected.
+</ParamField>
+
+<ParamField body="events" type="array" required>
+  An array of event type strings to subscribe to (e.g. `["automation.triggered", "session.expired"]`). Pass `["*"]` to subscribe to all current and future event types.
+</ParamField>
+
+<ParamField body="secret" type="string">
+  A secret string used to sign outgoing payloads with HMAC-SHA256. Strongly recommended for production use. See [Verifying Webhook Signatures](#verifying-webhook-signatures) for details.
+</ParamField>
+
+**Request**
+
+```bash
+curl -X POST https://api.adimen.ai/v1/webhooks \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://yourapp.com/webhooks/adimen",
+    "events": ["automation.triggered", "session.expired"],
+    "secret": "your_webhook_secret"
+  }'
+```
+
+**Response (201)**
+
+```json
+{
+  "id": "wh_01hook456abc",
+  "url": "https://yourapp.com/webhooks/adimen",
+  "events": ["automation.triggered", "session.expired"],
+  "created_at": "2024-06-01T11:00:00Z",
+  "status": "active"
+}
+```
+
+---
+
+## GET /webhooks
+
+List all webhook endpoints registered on your account.
+
+**Request**
+
+```bash
+curl -X GET https://api.adimen.ai/v1/webhooks \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Response (200)**
+
+Returns an array of webhook objects, each using the same schema as the `POST /webhooks` response.
+
+```json
+[
+  {
+    "id": "wh_01hook456abc",
+    "url": "https://yourapp.com/webhooks/adimen",
+    "events": ["automation.triggered", "session.expired"],
+    "created_at": "2024-06-01T11:00:00Z",
+    "status": "active"
+  }
+]
+```
+
+---
+
+## DELETE /webhooks/{id}
+
+Delete a registered webhook. Adimen AI will immediately stop sending event notifications to the associated URL.
+
+**Path Parameters**
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the webhook to delete (e.g. `wh_01hook456abc`).
+</ParamField>
+
+**Request**
+
+```bash
+curl -X DELETE https://api.adimen.ai/v1/webhooks/wh_01hook456abc \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Response:** `204 No Content`
+
+---
+
+## Verifying Webhook Signatures
+
+If you provided a `secret` when registering your webhook, Adimen AI signs every outgoing payload using HMAC-SHA256. The computed signature is included in the `X-Adimen-Signature` request header in the format `sha256=<hex_digest>`.
+
+Verify each incoming request by recomputing the HMAC on your side and comparing it against the header value. Reject any request where the signatures do not match.
+
+```python verify_webhook.py
+import hmac
+import hashlib
+
+def verify_signature(payload: bytes, secret: str, signature: str) -> bool:
+    expected = hmac.new(
+        secret.encode(),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(f"sha256={expected}", signature)
+```
+
+<Warning>
+  Webhook URLs must use HTTPS. Any registration attempt using a plain HTTP endpoint will be rejected with a `400` error. Always use a valid TLS certificate on your receiving endpoint.
+</Warning>
+
+<Tip>
+  Always verify webhook signatures in production. Skipping signature verification exposes your application to spoofed payloads from unauthorized senders. Treat any request that fails signature verification as untrusted and discard it.
+</Tip>

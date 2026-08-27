@@ -1,0 +1,90 @@
+---
+title: "Adimen AI REST API: Developer Integration Reference"
+sidebarTitle: "Introduction"
+description: "The Adimen AI REST API lets developers integrate AI assistant capabilities, sessions, and user management into their own apps. Requires a Business plan."
+---
+
+The Adimen AI REST API allows you to integrate the same AI engine powering the mobile app directly into your own applications, workflows, and services. The API is available on Business plans and gives you programmatic access to AI queries, user management, and more — all through standard HTTPS requests and JSON responses.
+
+## Base URL
+
+All API endpoints are relative to the following base URL:
+
+```text
+https://api.adimen.ai/v1
+```
+
+The API uses HTTPS exclusively. Requests made over plain HTTP will be rejected.
+
+## Versioning
+
+The current API version is `v1`, and it is included in every URL path. When Adimen AI introduces breaking changes, a new version (e.g., `v2`) is released at a new path. Your existing integrations continue to work on the previous version until it is retired.
+
+<Info>
+  Adimen AI provides a minimum **6-month deprecation notice** before retiring any API version. You will receive advance communication to migrate your integration before the old version is shut down.
+</Info>
+
+## Request Format
+
+All request bodies must be valid JSON. Include the `Content-Type: application/json` header on every `POST` and `PUT` request.
+
+```bash
+curl -X POST https://api.adimen.ai/v1/ai/query \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Summarize this document for me."}'
+```
+
+## Response Format
+
+All responses are JSON. Successful requests return an HTTP `2xx` status code alongside a JSON body. If something goes wrong, you'll receive an HTTP `4xx` or `5xx` status code with a structured error object:
+
+```json
+{
+  "error": {
+    "code": "invalid_request",
+    "message": "The field 'query' is required.",
+    "details": {}
+  }
+}
+```
+
+Use the `code` field to identify the error type programmatically, and the `message` field to understand what went wrong.
+
+## Error Codes
+
+The table below lists the common error codes returned by the Adimen AI API:
+
+| Code | HTTP Status | Description |
+|---|---|---|
+| `invalid_request` | 400 | Missing or malformed request parameters. |
+| `unauthorized` | 401 | API key is missing or invalid. |
+| `forbidden` | 403 | API key is valid but lacks permission for this resource. |
+| `not_found` | 404 | The requested resource does not exist. |
+| `rate_limited` | 429 | You have exceeded the allowed number of requests. |
+| `internal_error` | 500 | An unexpected error occurred on the Adimen AI server. |
+
+## Rate Limits
+
+On the Business plan, each API key is allowed **1,000 requests per minute**. Every API response includes the following headers so you can monitor your usage in real time:
+
+| Header | Description |
+|---|---|
+| `X-RateLimit-Limit` | Maximum requests allowed per minute for your key. |
+| `X-RateLimit-Remaining` | Number of requests remaining in the current window. |
+| `X-RateLimit-Reset` | Unix timestamp (UTC) when the rate limit window resets. |
+
+<Warning>
+  If you exceed the rate limit, the API returns a `429 rate_limited` error. Build exponential backoff and retry logic into your integration to handle this gracefully.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api/authentication">
+    Generate an API key and learn how to authenticate every request securely.
+  </Card>
+  <Card title="AI Queries" icon="robot" href="/api/ai-queries">
+    Send queries to the Adimen AI engine and handle structured responses.
+  </Card>
+</CardGroup>

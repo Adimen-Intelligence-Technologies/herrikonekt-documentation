@@ -1,0 +1,54 @@
+---
+title: "How Adimen AI Works: Platform Architecture Overview"
+sidebarTitle: "Overview"
+description: "Learn about the Adimen AI platform: how the AI engine processes requests, syncs data, and delivers personalized results across your devices."
+---
+
+Adimen AI is built on a cloud-native platform that connects your mobile device to a powerful AI engine, a real-time sync layer, and a personalization system — all working together in the background so you get fast, relevant responses every time you interact with the app. This page explains the key components of the platform and how they interact to deliver your experience.
+
+## The AI Engine
+
+Adimen AI processes your requests using a cloud-based AI engine purpose-built for natural language understanding. When you type or speak a command, the app sends your input securely to the engine over an encrypted connection. The engine analyzes your request in context — taking into account your conversation history, connected integrations, and personalization profile — and returns a tailored response directly to your device.
+
+<Info>
+  All data transmitted between your device and the Adimen AI engine is encrypted in transit using TLS 1.2 or later. Your request content is never sold to third parties.
+</Info>
+
+Because processing happens in the cloud, AI-powered responses require an active internet connection. The app handles connectivity interruptions gracefully — see [Offline Mode](#offline-mode) below for details.
+
+## Personalization
+
+Adimen AI improves over time by learning from your usage patterns. The more you interact with the app, the better it gets at anticipating the type of responses, formats, and details that are most useful to you. Personalization applies across areas like response tone, preferred summary length, and the order in which connected services are prioritized.
+
+You remain in full control of your personalization data. To review, export, or delete it, go to **Settings > Privacy > Personalization Data**. Disabling personalization switches the AI engine to a generic mode that does not retain usage patterns between sessions.
+
+<Tip>
+  The personalization engine works best when you interact with Adimen AI consistently over a few days. Early responses may feel more generic — this improves quickly as the system builds context.
+</Tip>
+
+## Data Sync
+
+Adimen AI uses a real-time sync layer to keep your experience consistent across every device where you're logged in. Your preferences, conversation history, connected integrations, and notification settings are all stored in your cloud account and pushed to each device automatically whenever a change is made.
+
+Sync is opt-in and can be enabled or disabled at any time under **Settings > Account > Cloud Sync**. When sync is off, your data is stored locally on the current device only and is not recoverable if you uninstall the app or lose your device.
+
+## Offline Mode
+
+Core app features — such as browsing your conversation history, reviewing saved responses, and managing settings — work without an internet connection. AI-powered features that require the cloud engine, such as answering new questions or processing commands, are unavailable offline.
+
+When you submit a request while offline, Adimen AI queues it locally on your device. As soon as connectivity is restored, the app automatically processes any queued requests and delivers the responses. A status indicator in the chat view shows you whether the app is connected, queuing, or syncing.
+
+<Note>
+  Queued requests are processed in the order they were submitted. If you close and reopen the app while offline, your queued requests are preserved and will still be sent when you reconnect.
+</Note>
+
+## Learn More
+
+<CardGroup cols={2}>
+  <Card title="AI Features" icon="brain" href="/concepts/ai-features">
+    Dive deeper into the specific AI capabilities Adimen AI offers
+  </Card>
+  <Card title="Data & Privacy" icon="shield" href="/concepts/data-privacy">
+    Understand how your data is stored, used, and protected
+  </Card>
+</CardGroup>
