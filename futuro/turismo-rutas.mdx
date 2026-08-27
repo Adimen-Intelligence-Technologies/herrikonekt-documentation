@@ -1,0 +1,102 @@
+---
+title: "Turismo: mapa comunitario de rutas y sitios (idea futura)"
+sidebarTitle: "Turismo y rutas"
+description: "Estudio de viabilidad y plan de implementación para un catálogo comunitario y geolocalizado de rutas y lugares que visitar (miradores, playas, cascadas, cimas, rutas de montaña) por pueblo y por región. No está planificado; se documenta como funcionalidad futura."
+icon: "map"
+---
+
+<Note>
+  **Estado: idea, no planificada.** Esta página describe una funcionalidad que **no se va a construir por ahora**. Se documenta para dejar constancia del estudio de viabilidad y de cómo se llevaría a cabo por fases.
+</Note>
+
+## Qué haría
+
+Un sistema **comunitario** de **rutas y sitios que visitar** por pueblo y por región: miradores, playas, rutas de montaña y BTT, cascadas, cimas, fuentes, áreas recreativas, sitios históricos, sitios bonitos…
+
+- Los usuarios **suben lugares y rutas** (traza GPX o dibujada), los clasifican por categoría, los **puntúan** (1–5 estrellas), los **comentan**, suben **fotos** y **reportan** los que ya no existen o son peligrosos.
+- Todo aparece en un **mapa**: estando en un pueblo ves o añades sus lugares; o filtras por **provincia / comunidad autónoma / España entera**.
+- Alta **moderada**: el usuario crea un lugar → queda `pendiente` → un admin lo aprueba o rechaza.
+
+Encajaría con el widget `excursions` (título "Turismo", ruta `/excursiones`) que **ya existe oculto** en la app.
+
+## Viabilidad
+
+**Conclusión: es posible, y con poco riesgo técnico.** El backend ya tiene casi todas las primitivas necesarias; se reutilizan patrones existentes:
+
+| Primitiva ya en el proyecto | Se reutiliza para |
+| --- | --- |
+| GeoJSON Point + índice `2dsphere` + consultas `$near` (comercios) | Geometría de lugares y consultas de proximidad |
+| Subida y compresión de imágenes a Vercel Blob con `kind` por entidad | Fotos de lugares (`kind: 'lugares'`) |
+| Descripciones multiidioma, geocoder Photon (OSM), auditoría `HistorialCambio` | Nombre/descripción, jerarquía geográfica por geocodificación inversa |
+| Patrón favoritos (fila única por usuario/entidad + contador denormalizado) | `lugarFavoritos`, `lugarValoraciones` |
+| Foro: comentarios planos, reportes, moderación, borrado lógico con `deletedBy` | `lugarComentarios`, `lugarReportes` |
+| Flujo `comercio-sugerencias` (usuario propone → admin modera → se publica, con límite por usuario) | Alta moderada de lugares |
+
+## Fuentes de datos externas (Fase 2)
+
+Para **enriquecer el catálogo** más adelante (no en la primera fase):
+
+| Fuente | Contenido | Licencia | Uso |
+| --- | --- | --- | --- |
+| **IGN / CNIG — Senderos FEDME (GR/PR/SL)** | ~50.000 km de senderos homologados, en GPX/KML/SHP | **CC-BY 4.0** (uso comercial OK, solo atribución) | ✅ |
+| **Open Data Euskadi** | Red de senderos de Gipuzkoa (GPX por ruta), etapas de GR, recursos turísticos (GeoJSON/JSON/API) | **CC-BY 4.0** | ✅ |
+| **OpenStreetMap (Overpass API)** | Puntos (`tourism=viewpoint`, `natural=beach`, `natural=peak`, `waterway=waterfall`…) y rutas a pie | **ODbL**: atribución en el mapa + *compartir-igual* la BD derivada → hay que mantener la procedencia separada | ⚠️ con cuidado |
+| **datos.gob.es** | Datasets de senderos autonómicos (Andalucía, etc.) | Variable | ⚠️ caso a caso |
+| **Wikiloc** | La mayor comunidad de rutas | Términos **prohíben** uso no personal / comercial; sin API pública | ❌ solo enlace externo, no como fuente |
+
+### Otras consideraciones legales
+
+- El **contenido de usuario** necesita una **cesión de licencia** en los términos de uso de la app.
+- **Responsabilidad**: mostrar "ruta de montaña" implica dificultad y riesgo → campos de **dificultad / distancia / desnivel obligatorios** en rutas y **aviso legal** en la ficha.
+
+## Cómo se implementaría
+
+### Fase 1 — contenido de la comunidad (sin datasets externos)
+
+<Steps>
+  <Step title="Colección lugares">
+    Un lugar es un **punto** (GeoJSON Point) o una **ruta** (GeoJSON LineString), con categoría, nombre/descripción, fotos, métricas de ruta (distancia, desnivel, duración, dificultad), traza GPX opcional en Blob, y jerarquía geográfica (`municipio`/`provincia`/`comunidadAutonoma`) resuelta por geocodificación inversa al crear.
+  </Step>
+  <Step title="Taxonomía lugarCategorias">
+    Gestionable por admin (mismo patrón que `tipoComercio`): mirador, playa, ruta de montaña, ruta BTT, cascada, cima, fuente, área recreativa, sitio histórico, sitio bonito…
+  </Step>
+  <Step title="Colecciones de comunidad">
+    `lugarComentarios` (como `ForoReply`), `lugarValoraciones` (1–5, fila única por usuario/lugar + media denormalizada), `lugarFavoritos` (como `Favorito`), `lugarReportes` (como `ForoReport`, motivos: no-existe / peligroso / inaccesible / datos-incorrectos / contenido-inapropiado / duplicado).
+  </Step>
+  <Step title="Alta moderada y auto-ocultación">
+    El usuario crea → `estado: 'pendiente'` → admin aprueba/rechaza. Límite de lugares pendientes por usuario. **Auto-ocultación** del mapa cuando varios usuarios distintos reportan "no-existe".
+  </Step>
+  <Step title="Endpoint de mapa/listado">
+    `GET /api/lugares` con un único modo espacial por petición: `bbox` (viewport) | proximidad (`lat`/`lng`/`radio`) | `ciudadId` | `provincia`/`comunidadAutonoma` | ninguno (España entera, paginado). Filtros por categoría, tipo de geometría, dificultad y texto.
+  </Step>
+  <Step title="Ingesta de traza GPX">
+    `POST /api/lugares/gpx`: parsea un `.gpx`, lo valida, lo simplifica para almacenamiento, calcula distancia/bbox/desnivel y guarda el crudo en Blob. Nueva dependencia de parsing/geometría (p. ej. `@tmcw/togeojson` + `@turf/simplify` / `@turf/length`).
+  </Step>
+  <Step title="Admin">
+    `app/admin/lugares/`: cola de moderación, cola de reportes, gestión de la taxonomía. `kind: 'lugares'` en `POST /api/upload`.
+  </Step>
+</Steps>
+
+### Fase 2 — ingesta de datasets externos
+
+Adaptadores por fuente (FEDME, Open Data Euskadi, OSM/Overpass) con sincronización idempotente y **procedencia separada** (obligatorio por ODbL para OSM). No entra en la primera fase.
+
+### App (`Herrikonekt`)
+
+- **Mostrar el widget** `excursions` (hoy oculto) y su pantalla `app/excursiones.tsx` con un **mapa** (MapLibre, ya integrado) + lista filtrable.
+- Alta de lugar/ruta desde la app (formulario + selector de documento GPX con `expo-document-picker`, ya instalado), fotos con `expo-image-picker`.
+- Fichas con comentarios, valoración, favorito, reporte — reutilizando los componentes del foro y de favoritos.
+- Sin cambios nativos → entregable como actualización OTA (el parsing de GPX vive en el servidor).
+
+## Qué haría falta para arrancarlo
+
+- [ ] Añadir la **cesión de licencia de contenido de usuario** y el **aviso de responsabilidad** de rutas a los términos de uso.
+- [ ] Decidir el alcance de la Fase 1 (¿solo puntos primero, rutas después?).
+- [ ] Confirmar la dependencia de parsing GPX en el diseño de implementación.
+- [ ] Crear los changes de OpenSpec `comunidad-lugares` (Fase 1) en `herrikonekt-server` y su gemelo en la app.
+
+## Estado
+
+<Info>
+  **No planificada.** Es la funcionalidad futura más grande de las estudiadas: implica 6 colecciones nuevas, moderación, mapa interactivo con clustering y, en Fase 2, ingesta de datasets con licencias distintas. El riesgo técnico es bajo (todo son patrones ya existentes), pero el esfuerzo es alto. Pendiente de priorización.
+</Info>
