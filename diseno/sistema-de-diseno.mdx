@@ -1,0 +1,116 @@
+---
+title: "Sistema de diseño"
+sidebarTitle: "Sistema de diseño"
+description: "Los tokens visuales de Herrikonekt: paleta de marca, tipografías Alan Sans + Satoshi, la escala de texto de 9 variantes (AppText), espaciado, sombras y las paletas seccionales de Eventos, Esquelas y Perfil."
+icon: "palette"
+---
+
+Todos los tokens visuales de la app viven en `constants/` y son reflejo 1:1 de la librería de Figma **"Herrikonekt — Design System"**. Esta página los resume.
+
+## Base de marca
+
+Cuatro colores que definen la identidad. Se usan siempre que encajan.
+
+| Token | Valor | Rol |
+| --- | --- | --- |
+| `background` | `#FDF0D8` | Fondo de la app (crema). |
+| `headingColor` | `#133212` | Verde oscuro: titulares, CTAs principales, texto sobre fondos claros, heros de sección. |
+| `categoryBorder` | `#A0F981` | Verde claro (lima): acentos, chips, franjas de acento, bordes de categoría. |
+| `white` | `#FFFFFF` | Texto sobre fondos oscuros / superficies blancas. |
+
+## Paleta completa (`AppColors`)
+
+15 claves en `constants/colors.ts`. Las de la base de marca más estas utilidades semánticas:
+
+| Token | Valor | Uso |
+| --- | --- | --- |
+| `primary` | `#009B48` | CTAs destacados (favoritos, spinners). |
+| `primaryDark` | `#223006` | Estado presionado / oscuro. |
+| `secondary` | `#D52B1E` | Errores y alertas. |
+| `text` | `#101805` | Texto de cuerpo. |
+| `textSecondary` | `#5D6B82` | Texto atenuado / secundario. |
+| `card` | `#FFFFFF` | Superficie de tarjeta. |
+| `gray` | `#CDD5E1` | Gris medio. |
+| `darkGray` | `#8A94A6` | Gris oscuro. |
+| `lightGray` | `#eeeeee` | Gris muy claro. |
+| `star` | `#FFB800` | Estrellas de valoración. |
+| `shadow` | `rgba(15,23,42,0.08)` | Sombra base. |
+| `tabInactive` | `#A1A3A1` | Icono de pestaña inactiva. |
+| `border` | `transparent` | Borde por defecto (sin borde). |
+
+<Warning>
+  La clave `lightGreen` (`#e7e7e7`) tiene un **nombre engañoso**: no es verde, es un gris claro. Trátala como neutro; pendiente de renombrar o eliminar.
+</Warning>
+
+### `PremiumGold`
+
+Gradiente dorado, **excepción justificada** fuera de la base de marca, solo para comercios [destacados](/funcionalidades/comercios-destacados):
+
+- `gradient`: `#AD8B27 → #F7E582 → #AD8B27`
+- `inset`: `#E2CD5E` · `textOnGold`: `#133212`
+
+### `withOpacity(hex, alpha)`
+
+Helper de `constants/colors.ts` para no repetir literales `rgba(r,g,b,a)` calculados a mano: `withOpacity(AppColors.headingColor, 0.6)`.
+
+## Tipografía
+
+Dos familias, registradas en `app/_layout.tsx` con `useFonts`:
+
+| Familia | Pesos | Para qué | Token |
+| --- | --- | --- | --- |
+| **Alan Sans** | SemiBold, Bold, Medium | Titulares | `FontFamilies.heading` / `FontFamilies.alanSans.*` |
+| **Satoshi** | Regular, Medium | Cuerpo | `FontFamilies.body` / `FontFamilies.satoshi.*` |
+
+<Note>
+  No se añaden más pesos sin pedirlo: Regular/Black de Alan Sans y Bold/Italic/Black de Satoshi están descartados para mantener la identidad compacta.
+</Note>
+
+### La escala de texto: `AppText`
+
+Todo el texto de UI usa `<AppText variant="…">` (`components/ui/AppText.tsx`) con una de **9 variantes** (`constants/typography.ts`). El componente **no acepta** `fontFamily`, `fontWeight`, `fontSize`, `letterSpacing` ni `color` sueltos — solo `variant`, `color`, `align` y estilos de layout.
+
+| Variante | Familia | Tamaño | Interlineado | Tracking | Color por defecto |
+| --- | --- | --- | --- | --- | --- |
+| `title1` | Alan Sans Bold | 27 | 33 | -0.81 | verde oscuro |
+| `title2` | Alan Sans Medium | 21 | 28 | -0.63 | verde oscuro |
+| `title3` | Alan Sans Medium | 19 | 23 | -0.57 | verde oscuro |
+| `headline` | Alan Sans SemiBold | 16 | 21 | -0.48 | verde oscuro |
+| `body` | Satoshi Medium | 15 | 20 | -0.45 | texto |
+| `callout` | Satoshi Regular | 14 | 20 | -0.42 | texto |
+| `subhead` | Satoshi Regular | 12 | 16 | -0.36 | texto secundario |
+| `footnote` | Satoshi Regular | 11 | 13 | -0.33 | texto secundario |
+| `caption1` | Satoshi Regular | 11 | 13 | -0.33 | texto secundario |
+
+Hay un `size` como **escape hatch** documentado para numerales decorativos fuera de la escala (mantiene familia y tracking de la variante).
+
+## Espaciado y layout
+
+| Token | Valor | Uso |
+| --- | --- | --- |
+| `ScreenLayout.screenPadding` | `16` | **Padding lateral estándar** de toda pantalla (header, listas, contenido). Origen único de verdad; los layouts seccionales lo heredan. |
+| `Spacing` | `xs 4 · sm 8 · md 12 · lg 16 · xl 24 · 2xl 32` | Escala de espaciado base 4. |
+
+### `CardShadow`
+
+Sombra compartida por las tarjetas de comercio (`BusinessCard`, `HomeBusinessCard`, `PuebloCard`): `#0F172A`, offset `(0,4)`, opacidad `0.05`, radio `10`, elevation `1`.
+
+## Paletas seccionales
+
+Áreas concretas tienen su propio archivo de tokens (`*Colors`, `*Layout`, `*Shadow`) sobre la base de marca:
+
+| Sección | Archivo | Rasgos |
+| --- | --- | --- |
+| **Eventos** | `constants/events.ts` | Hero verde `#0B4D32`, acento `#DEF087`, `heroRadius 28`, `cardRadius 20`, `calendarRadius 24`. |
+| **Esquelas** | `constants/esquelas.ts` | Misma familia que Eventos pero **tono más sobrio** (sin "stickers" en el hero). |
+| **Perfil** | `constants/profile.ts` | `ProfileColors`: pantalla verde oscuro + texto crema (login y perfil se leen como una experiencia continua). `ProfileHomeColors`: rediseño con fondo blanco y tarjetas de color. |
+
+Regla: si cambian radios, paddings o elevación de una sección, hay que mantener sincronizados estos archivos.
+
+## Reglas para contribuir
+
+- **Texto → `AppText`** con una de las 9 variantes. Nunca `Text` + `StyleSheet` con `fontSize`/`fontWeight` sueltos (salvo el `size` como escape hatch).
+- **Color → tokens de `AppColors`**. Prohibido el hex crudo en componentes (`#133212`, `#A0F981`, `#FFFFFF`, `#FDF0D8`…) y las constantes locales tipo `BRAND_DARK = '#133212'`.
+- **Opacidades → `withOpacity(token, alpha)`**, no `rgba()` a mano.
+- **Padding lateral → `ScreenLayout.screenPadding`** (`16`), nunca `16` hardcodeado en pantallas nuevas.
+- Componentes reutilizables por debajo de ~200 líneas.

@@ -51,6 +51,12 @@
             ]
           },
           {
+            "group": "Diseño",
+            "pages": [
+              "diseno/sistema-de-diseno"
+            ]
+          },
+          {
             "group": "Proyecto",
             "pages": [
               "funcionalidades/estado"
