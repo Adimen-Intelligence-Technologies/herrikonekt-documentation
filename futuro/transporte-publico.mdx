@@ -1,0 +1,88 @@
+---
+title: "Transporte público: próximos pasos y líneas (idea futura)"
+sidebarTitle: "Transporte público"
+description: "Estudio de viabilidad y plan de implementación para responder '¿cuándo pasa el próximo autobús/tren desde mi pueblo?' y '¿qué líneas llegan aquí y a dónde van?', con tiempo real donde exista. Datos GTFS de Moveuskadi. No está planificado."
+icon: "bus"
+---
+
+<Note>
+  **Estado: idea, no planificada.** Esta página describe una funcionalidad que **no se va a construir por ahora**. Se documenta para dejar constancia del estudio de viabilidad y de cómo se llevaría a cabo.
+</Note>
+
+## Qué haría
+
+Responder a dos preguntas por municipio:
+
+- **"¿Cuándo pasa el próximo autobús / tren desde mi pueblo?"** — paradas cercanas y sus **próximos pasos** (hora programada, hora estimada, retraso, y si es dato en tiempo real).
+- **"¿Qué líneas llegan aquí y a dónde van?"** — las líneas que conectan el municipio y con qué otros municipios.
+
+Un municipio "tiene transporte" si hay ≥ 1 parada asociada a él.
+
+## Viabilidad
+
+**Conclusión: viable, y de forma óptima para Euskadi.**
+
+| Fuente | Contenido | Licencia | Uso |
+| --- | --- | --- | --- |
+| **Moveuskadi** (Open Data Euskadi) | Red completa de transporte público de Euskadi: metro, tranvía, bus urbano e interurbano, tren regional y cercanías, funicular, transbordador. Formatos estándar **GTFS** (estático) y **GTFS-RT** (tiempo real: posición de vehículos, retrasos, alertas), más SIRI y NeTEx. **Sin API key.** | **CC-BY 4.0** | ✅ Fuente principal (Fase 1) |
+| **Punto de Acceso Nacional de movilidad** (`nap.transportes.gob.es`) | Agrega los GTFS de operadores de toda España. Gratis, con API por ApiKey. | — | ⚠️ Adaptador de Fase 2 |
+
+**Verificado el 2026-08-27**: `data-index-gtfs.json` y `data-index-gtfs-rt.json` respondieron **HTTP 200** con las URLs de descarga por operador (Lurraldebus por subredes —Goierrialdea, Ekialdebus, Guipuzkoana—, buses urbanos municipales…) y marcas de actualización recientes (el índice de tiempo real se refresca cada pocos minutos).
+
+**GTFS es el estándar de facto**: hay librerías para parsear el estático y decodificar el protobuf de GTFS-RT. No hace falta scraping.
+
+### El reto no es el dato, es el volumen
+
+El GTFS estático (paradas, líneas, viajes, horarios) es **grande** y su procesamiento en un entorno serverless es lo complicado. Se resuelve **importando por operador y precomputando la tabla de salidas por parada**, de modo que la consulta "próximos pasos" sea O(1).
+
+### Consideración legal
+
+Atribución: *"Datos: Moveuskadi — Open Data Euskadi (CC-BY 4.0)"* y a cada operador.
+
+## Cómo se implementaría
+
+Mismo patrón que el resto del contenido externo (ver [Sincronización de contenido](/arquitectura/sincronizacion)): dato externo cacheado + geolocalización `2dsphere` + servir por proximidad.
+
+### Fase 1 — paradas cercanas y próximos pasos (Euskadi vía Moveuskadi)
+
+<Steps>
+  <Step title="Ingesta GTFS estático">
+    `lib/services/transporte/gtfs/`: descargar los ZIP por operador desde el índice de Moveuskadi, parsear, y cargar colecciones normalizadas — `gtfsFeeds`, `gtfsParadas` (GeoJSON Point + `2dsphere`, enlazadas a `ciudadId` por municipio), `gtfsLineas`, `gtfsCalendario` (`calendar` + `calendar_dates`) — y una colección **precomputada** `gtfsSalidasParada` (por parada, la lista ordenada de salidas: línea, viaje, destino, hora, servicio). Import **idempotente** (se salta si el ZIP no cambió).
+  </Step>
+  <Step title="Capa de tiempo real">
+    Descarga y decodificación del protobuf **GTFS-RT** (`trip_updates`, `alerts`, `vehicle_positions`) por operador, cacheada en `gtfsTiempoReal` con `fetchedAt`, refrescada **bajo demanda** con caché corta (≤ 60 s) en la ruta de consulta. **No hay cron de tiempo real** — el `.pb` se pide cuando alguien consulta.
+  </Step>
+  <Step title="Endpoints públicos">
+    - `GET /api/transporte/paradas` — proximidad | `ciudadId`.
+    - `GET /api/transporte/paradas/[id]/salidas` — próximos pasos: hora programada + hora estimada + retraso + `enTiempoReal`.
+    - `GET /api/transporte/lineas/[id]`.
+    - `GET /api/transporte/ciudades/[id]/conexiones` — qué líneas conectan el pueblo y con qué municipios.
+  </Step>
+  <Step title="Cron y admin">
+    `GET /api/cron/importar-gtfs` (diario) en `vercel.json`. `POST /api/transporte/importar` (disparo manual) + página `app/admin/transporte/` con el estado y la frescura de cada feed.
+  </Step>
+</Steps>
+
+### Fase 2 — resto de España
+
+Adaptador del **Punto de Acceso Nacional** (`NAP_API_KEY`), mismo pipeline GTFS. No entra en la primera fase.
+
+### App (`Herrikonekt`)
+
+- Acceso directo "Transporte" en "Mi ciudad", visible **solo si el municipio tiene paradas**.
+- Pantalla `app/transporte.tsx` (+ `hooks/use-transporte.ts`): paradas cercanas en un mapa/lista, con los **próximos pasos** de cada una y un indicador de "en tiempo real"; ficha de línea; sección de conexiones del pueblo.
+- Capa de red en `lib/api/transporte.ts` vía `lib/subscriber`; las salidas con caché corta por el tiempo real.
+- Sin cambios nativos → entregable como actualización OTA.
+
+## Qué haría falta para arrancarlo
+
+- [ ] Confirmar que el parser de GTFS (unzip + CSV) y `gtfs-realtime-bindings` (protobuf) compilan con Next 16.
+- [ ] Resolver el procesamiento del import: `maxDuration` alto en la función serverless o, si no cabe, ejecutarlo como script / acción programada.
+- [ ] Elegir `TRANSPORTE_FEEDS` (lista blanca de operadores) o importar todos los del índice.
+- [ ] Crear el change de OpenSpec `transporte-publico` en `herrikonekt-server` (el estudio ya está redactado) y su gemelo en la app.
+
+## Estado
+
+<Info>
+  **No planificada.** Datos gratuitos, estándar (GTFS) y verificados para Euskadi. El riesgo está en el **volumen del GTFS estático** y su procesamiento en serverless, que exige precomputar la tabla de salidas. Esfuerzo medio-alto por esa parte de ingesta; la app en sí es una pantalla más.
+</Info>
