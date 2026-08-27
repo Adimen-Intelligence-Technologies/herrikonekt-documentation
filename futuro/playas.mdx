@@ -1,0 +1,94 @@
+---
+title: "Playas: bandera de baño y mareas (idea futura)"
+sidebarTitle: "Playas y mareas"
+description: "Estudio de viabilidad y plan de implementación para mostrar, por playa, la bandera de baño (verde/amarilla/roja), la tabla de mareas, las condiciones del mar, la Bandera Azul y la calidad del agua. Pensada para pueblos costeros de Euskadi con degradación elegante en el resto. No está planificada."
+icon: "umbrella-beach"
+---
+
+<Note>
+  **Estado: idea, no planificada.** Esta página describe una funcionalidad que **no se va a construir por ahora**. Se documenta para dejar constancia del estudio de viabilidad y de cómo se llevaría a cabo.
+</Note>
+
+## Qué haría
+
+Para los pueblos **costeros o con playa**, mostrar por cada playa:
+
+- **Bandera de baño** — verde / amarilla / roja, con el motivo
+- **Mareas** — pleamar / bajamar del día con hora y altura, y tabla a varios días
+- **Condiciones** — temperatura del agua, oleaje, viento, índice UV, aforo
+- **Bandera Azul** — el galardón de temporada (distintivo)
+- **Calidad del agua de baño** — clasificación "excelente / buena / suficiente / insuficiente"
+
+Un pueblo se consideraría **"costero"** simplemente si tiene ≥ 1 playa (no hace falta un campo nuevo en el municipio). Encajaría como acceso directo en "Mi ciudad" solo para esos pueblos.
+
+## Viabilidad
+
+**Conclusión: viable para el objetivo real** (pueblos costeros de Euskadi), con **degradación elegante** en el resto de España y un estado "sin dato" honesto donde no hay fuente.
+
+| Dato | Disponibilidad | Fuente |
+| --- | --- | --- |
+| **Mareas** | ✅ Completo, con predicción exacta (la marea es astronómica, se predice semanas por delante) | APIs JSON gratuitas — **MeteoGalicia verificada funcionando** desde este entorno (HTTP 200, preamar/baixamar con hora y altura). Puertos del Estado (REDMAR/Nivmar) e IHM son las autoritativas para el Cantábrico |
+| **Bandera de baño — Euskadi** | ✅ En tiempo real, por playa (bandera, temperatura del agua, aforo, oleaje) | Open Data Euskadi / Open Data Bizkaia — **CC-BY 4.0** |
+| **Bandera de baño — resto de España** | ❌ No hay API nacional; cada comunidad/ayuntamiento la gestiona, cobertura desigual | — |
+| **Condiciones del mar (fallback nacional)** | ✅ Predicción (2 actualizaciones/día): estado del mar, oleaje, temperatura del agua, UV, tiempo — **pero no la bandera de seguridad** | **AEMET — Predicción de Playas** (JSON, API key gratuita) |
+| **Bandera Azul** | ✅ Anual (galardón de temporada) | ADEAC |
+| **Calidad del agua** | ✅ Periódica (analíticas cada ~2 semanas en temporada) | Sistema nacional **NÁYADE** (Ministerio de Sanidad) |
+
+**Todas las fuentes son gratuitas.** "Tiempo real" no aplica a la marea (es predicción); el nivel del mar real sí se mide cada ~20 min en los mareógrafos REDMAR.
+
+### Consideración legal
+
+- **Atribución** a cada fuente (CC-BY para Euskadi, AEMET, Puertos del Estado).
+- **Aviso de responsabilidad** en la ficha: *"consulta siempre la bandera física de la playa; este dato es informativo"*.
+
+## Cómo se implementaría
+
+Mismo patrón que **farmacias de guardia**: dato externo cacheado en Mongo por clave y servido con consulta de proximidad. El bloque de banderas/condiciones se refresca por cron; las mareas, al ser predicción, una vez al día.
+
+### Fase 1 — banderas y condiciones (Euskadi + fallback AEMET) + tabla de mareas
+
+<Steps>
+  <Step title="Colección playas">
+    Un documento por playa con datos estáticos (nombre, municipio, `ciudadId`, `ubicacion` GeoJSON Point, longitud, servicios, `banderaAzul`, `puertoMareasRef`) + un bloque `estadoActual` que el cron refresca (bandera, `motivoBandera`, `temperaturaAguaC`, oleaje, viento, `uvi`, aforo, `actualizadoEn` de la fuente, `fetchedAt`, `fuente`) + una `prevision` opcional (predicción de AEMET por día).
+  </Step>
+  <Step title="Colección mareasPuerto">
+    Un documento por `(puertoId, fecha)` con los extremos del día (pleamar/bajamar + hora + altura) y `fetchedAt`. Las playas la referencian por `puertoMareasRef`. Índice único `(puertoId, fecha)`.
+  </Step>
+  <Step title="Servicio con adaptadores">
+    `lib/services/playas/` con interfaz de adaptador y tres adaptadores:
+    - **`opendata-euskadi`** — bandera + temperatura + aforo en tiempo real de la costa vasca.
+    - **`aemet-playas`** — predicción nacional; rellena condiciones y `prevision`, **nunca fija la bandera**; requiere `AEMET_API_KEY`.
+    - **`mareas`** — predicción de mareas por puerto → `mareasPuerto` (proveedor configurable con `PLAYAS_FUENTE_MAREAS`).
+  </Step>
+  <Step title="Sincronizadores y cron">
+    Idempotentes (upsert + `contentHash`), aislados por playa/puerto. `GET /api/cron/sincronizar-estado-playas` (cada 30 min) y `GET /api/cron/sincronizar-mareas` (1×/día), autorizados con `Bearer CRON_SECRET` o sesión admin; entradas en `vercel.json`.
+  </Step>
+  <Step title="Endpoints públicos">
+    - `GET /api/playas` — proximidad | `ciudadId` | `provincia`.
+    - `GET /api/playas/[id]` — estado + previsión + Bandera Azul + calidad del agua.
+    - `GET /api/playas/[id]/mareas?dias=7`.
+  </Step>
+  <Step title="Admin y semilla">
+    `POST /api/playas/sincronizar` + página `app/admin/playas/` (alta/edición de playas, mapeo playa→puerto de mareas, estado de frescura). Script de semilla de playas desde los datasets de Open Data Euskadi. Registro en OpenAPI (`npm run check-openapi`).
+  </Step>
+</Steps>
+
+### App (`Herrikonekt`)
+
+- Acceso directo "Playas" en "Mi ciudad", visible **solo si el municipio activo tiene playas**.
+- Pantalla `app/playas.tsx` (+ `hooks/use-playas.ts`): lista de playas cercanas con su bandera y temperatura; ficha con bandera + motivo, tabla de mareas del día, condiciones, Bandera Azul, calidad del agua, y el **aviso de responsabilidad**.
+- Capa de red en `lib/api/playas.ts` vía `lib/subscriber` (offline), con la ubicación o el `ciudadId` activo.
+- Sin cambios nativos → entregable como actualización OTA.
+
+## Qué haría falta para arrancarlo
+
+- [ ] Dar de alta `AEMET_API_KEY` (gratuita) y elegir `PLAYAS_FUENTE_MAREAS`.
+- [ ] Sembrar el catálogo de playas (Open Data Euskadi) y mapear cada playa a su puerto de mareas.
+- [ ] Añadir el **aviso de responsabilidad** a los textos legales.
+- [ ] Crear el change de OpenSpec `playas-banderas-mareas` en `herrikonekt-server` (el estudio ya está redactado) y su gemelo en la app.
+
+## Estado
+
+<Info>
+  **No planificada.** Fuentes gratuitas y verificadas para el caso de uso principal (Euskadi). Esfuerzo medio: 2 colecciones, 3 adaptadores, 2 crons y una pantalla condicional. Pendiente de priorización.
+</Info>
