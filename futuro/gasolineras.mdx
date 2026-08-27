@@ -1,0 +1,88 @@
+---
+title: "Precio de gasolineras (idea futura)"
+sidebarTitle: "Precio de gasolineras"
+description: "Estudio de viabilidad y plan de implementación para mostrar en la app el precio de las gasolineras cercanas o del pueblo, con filtro por carburante y orden por precio o distancia. No está planificado; se documenta como funcionalidad futura."
+icon: "gas-pump"
+---
+
+<Note>
+  **Estado: idea, no planificada.** Esta página describe una funcionalidad que **no se va a construir por ahora**. Se documenta para dejar constancia del estudio de viabilidad y de cómo se llevaría a cabo.
+</Note>
+
+## Qué haría
+
+Mostrar en la app el **precio del carburante** de las gasolineras del pueblo o cercanas, casi en tiempo real, con:
+
+- **Filtro por producto** (gasolina 95, 98, gasóleo A, gasóleo premium, GLP…)
+- **Orden por precio** o **por distancia**
+- Detalle de cada estación con todos sus precios, rótulo, dirección, horario y **frescura del dato**
+
+Encajaría como un **acceso directo** en "Mi ciudad" — de hecho ya existe una definición de widget `gasolineras` en la app (`data/widgets.ts`), hoy **oculta**, con ruta `/gasolineras`. La pantalla podría usar la ubicación del usuario para ordenar por cercanía.
+
+## Viabilidad
+
+**Conclusión: es viable, y sin coste.**
+
+| Fuente | Situación | Uso |
+| --- | --- | --- |
+| **Servicio REST oficial del Ministerio** (Geoportal de Hidrocarburos / RISP Carburantes, `sedeaplicaciones.minetur.gob.es`) | API **oficial, pública y gratuita**. Sin clave, sin registro. JSON. Cubre todas las estaciones de España; se filtra por comunidad autónoma, provincia, municipio y producto. | ✅ Fuente única |
+| APIs de pago de terceros | Solo reempaquetan el mismo dato oficial gratuito. No aportan nada. | ❌ Innecesarias |
+
+**Verificado el 2026-08-27**: `GET .../EstacionesTerrestres/FiltroProvincia/20` devolvió **HTTP 200** en ~1 s con el JSON de todas las estaciones de Gipuzkoa y un campo `Fecha` con marca de tiempo reciente.
+
+### Matices
+
+- Los precios los **declaran los operadores** (obligación legal), así que "tiempo real" es en la práctica **"actualizado cada ~30 min"** según lo que reporte cada estación. La respuesta expondría tanto `fetchedAt` (nuestra última sincronización) como la `Fecha` oficial del dato.
+- `datos.gob.es` avisa de **accesos intermitentes** desde algunos proveedores cloud → se mitiga con reintentos y con que la app **siempre lee de nuestra caché**, nunca de la fuente.
+
+### Consideración legal
+
+Dato reutilizable bajo el marco **RISP** (Ley 37/2007, RD 1495/2011). Hay que **atribuir la fuente** ("Datos: Ministerio para la Transición Ecológica y el Reto Demográfico") y **no alterar los valores**.
+
+## Cómo se implementaría
+
+Mismo patrón que **farmacias de guardia**: dato externo cacheado en Mongo y servido con consulta de proximidad, más la geolocalización `2dsphere` que ya usan los comercios.
+
+### Backend (`herrikonekt-server`)
+
+<Steps>
+  <Step title="Colección">
+    Nueva colección `gasolineras`: un documento por estación (`ideess`), con rótulo, dirección, municipio/provincia, horario, `ubicacion` (GeoJSON Point), el mapa de `precios` por producto, la `Fecha` oficial y `fetchedAt`. Índices: `ubicacion` `2dsphere`, `provincia`, `municipio`, `ciudadId`.
+  </Step>
+  <Step title="Cliente y sincronizador">
+    `lib/services/gasolineras/minetur.ts` — cliente del servicio REST oficial (normaliza coordenadas con coma decimal, nombres de producto y precios vacíos) + sincronizador idempotente: upsert por `ideess` + `contentHash`, marca `deletedAt` las estaciones que desaparecen del feed tras una sincronización correcta.
+  </Step>
+  <Step title="Cron">
+    `GET /api/cron/sincronizar-gasolineras` (`Bearer CRON_SECRET` o sesión admin) + entrada en `vercel.json` con `*/30 * * * *`. Ámbito por lista configurable de provincias (`GASOLINERAS_PROVINCIAS`, por defecto las de las ciudades activas), con opción de modo nacional (`GASOLINERAS_MODO`).
+  </Step>
+  <Step title="Endpoints públicos">
+    - `GET /api/gasolineras` — un modo espacial por petición (`lat+lng+radio` | `ciudadId` | `municipio` | `provincia`), filtro `producto`, orden `precio` | `distancia`, paginado. Devuelve el precio del producto pedido, la distancia (si hay proximidad) y la frescura del dato.
+    - `GET /api/gasolineras/[id]` — todos los precios de una estación.
+  </Step>
+  <Step title="Admin">
+    `POST /api/gasolineras/sincronizar` (disparo manual) + página `app/admin/gasolineras/` con el estado de frescura y el recuento por provincia.
+  </Step>
+  <Step title="OpenAPI">
+    Registrar las rutas nuevas y pasar `npm run check-openapi`.
+  </Step>
+</Steps>
+
+### App (`Herrikonekt`)
+
+- **Mostrar el widget** `gasolineras` (hoy en `HIDDEN_WIDGETS` de `data/widgets.ts`) y ajustar su icono/imagen.
+- Pantalla `app/gasolineras.tsx` (+ `hooks/use-gasolineras.ts`, patrón "hook de pantalla"): lista de estaciones ordenable por precio/distancia, selector de producto, detalle por estación, y la **atribución de fuente** obligatoria.
+- Capa de red en `lib/api/gasolineras.ts` vía `lib/subscriber` con `key` estable (offline), pasando la ubicación o el `ciudadId` del municipio activo.
+- Tipos espejo en `lib/types/Gasolinera.ts`.
+- Sin cambios nativos → entregable como actualización OTA.
+
+## Qué haría falta para arrancarlo
+
+- [ ] Confirmar el ámbito inicial de provincias (`GASOLINERAS_PROVINCIAS`) o modo nacional.
+- [ ] Verificar la latencia y el bloqueo intermitente desde el entorno de producción (Vercel) — no solo desde local.
+- [ ] Crear el change de OpenSpec `precios-gasolineras` en `herrikonekt-server` (el estudio ya está redactado) y su gemelo en la app para el widget y la pantalla.
+
+## Estado
+
+<Info>
+  **No planificada.** El estudio de viabilidad está hecho y el resultado es muy favorable: API oficial, gratuita, sin clave y verificada. La implementación queda pendiente de priorización. Es de las funcionalidades futuras con menos fricción (sin coste ni dependencia de terceros).
+</Info>
