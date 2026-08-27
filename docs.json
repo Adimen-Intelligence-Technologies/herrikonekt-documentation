@@ -44,6 +44,12 @@
             "pages": [
               "funcionalidades/estado"
             ]
+          },
+          {
+            "group": "Funcionalidades futuras",
+            "pages": [
+              "futuro/loterias"
+            ]
           }
         ]
       }

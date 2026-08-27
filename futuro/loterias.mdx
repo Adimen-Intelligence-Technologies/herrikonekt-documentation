@@ -1,0 +1,84 @@
+---
+title: "Resultados de loterías (idea futura)"
+sidebarTitle: "Resultados de loterías"
+description: "Estudio de viabilidad y plan de implementación para mostrar en la app los resultados de las loterías españolas (Euromillones, Primitiva, Bonoloto, El Gordo, Lotería Nacional, La Quiniela). No está planificado; se documenta como funcionalidad futura."
+icon: "ticket"
+---
+
+<Note>
+  **Estado: idea, no planificada.** Esta página describe una funcionalidad que **no se va a construir por ahora**. Se documenta para dejar constancia del estudio de viabilidad y de cómo se llevaría a cabo si se decide abordarla.
+</Note>
+
+## Qué haría
+
+Mostrar en la app los **resultados de los sorteos de las loterías españolas**: Euromillones, La Primitiva, Bonoloto, El Gordo de la Primitiva, Lotería Nacional y La Quiniela — el último sorteo de cada juego y el histórico, con sus números y el escrutinio.
+
+Encaja como un **acceso directo más** en "Mi ciudad" (junto a Taxis, Farmacias de guardia, Esquelas…), con una pantalla de "Resultados" y el detalle de cada sorteo. A diferencia del resto de contenido de la app, **no es específico de un municipio**: los resultados son nacionales.
+
+## Viabilidad
+
+**Conclusión: es viable**, con una fuente de terceros como pieza principal.
+
+| Fuente | Situación | Uso |
+| --- | --- | --- |
+| **API oficial de SELAE** (Loterías y Apuestas del Estado) | No existe. No hay portal de desarrollador, ni claves, ni términos de uso públicos. | ❌ No disponible |
+| **Endpoints JSON de `loteriasyapuestas.es`** (`/servicios/buscadorSorteos`, `/servicios/fechasSorteosCelebrados`, `/servicios/proximosv3`) | No documentados, pero los usa el propio frontend oficial. Devuelven el escrutinio completo por juego y fecha. **Están tras Akamai Bot Manager**: todas las peticiones de prueba desde un entorno de servidor (IP de datacenter, sin navegador) devolvieron **HTTP 403**. Un cron en Vercel puede sufrir el mismo bloqueo. | ⚠️ Intento previo "best-effort" |
+| **APIs de terceros** (p. ej. `loteriasapi.com`) | Reempaquetan esos datos con contrato estable y términos de uso. Cubren todos los juegos, último sorteo + histórico. Plan gratuito ~1.000 peticiones/mes; **uso comercial requiere plan de pago**. | ✅ Fuente principal |
+
+### Consideración legal
+
+Los **números premiados son hechos**, no una obra protegida: redistribuirlos es viable. Lo que **no** se puede hacer es usar la **marca o los logotipos de SELAE**, ni dar a entender que la app tiene respaldo oficial. La pantalla mostraría solo datos numéricos y textos propios.
+
+## Cómo se implementaría
+
+El patrón sería el mismo que ya usan **farmacias de guardia** y la **sincronización de esquelas**: ingesta propia en el backend, caché en base de datos, y la app leyendo siempre de nuestra caché (nunca de la fuente externa).
+
+### Backend (`herrikonekt-server`)
+
+<Steps>
+  <Step title="Colección y schema">
+    Nueva colección `resultadosLoteria` en Mongo, una entrada por `(juego, fechaSorteo)`, con índice único e input de escritura validado con Zod (`lib/schemas/Loteria.ts`).
+  </Step>
+  <Step title="Servicio de ingesta con dos adaptadores">
+    `lib/services/loterias/` con una interfaz común (`sincronizar`, `probar`) y un registro por nombre:
+    - **`loteriasapi`** — cliente del API de terceros (`loteriasapi.com`), requiere `LOTERIASAPI_KEY`. Fuente principal.
+    - **`selae-servicios`** — cliente de los endpoints no documentados de `loteriasyapuestas.es` con cabeceras de navegador realistas; **tolera el 403** y cede el turno al siguiente adaptador. Intento previo gratuito y autoritativo.
+  </Step>
+  <Step title="Sincronizador idempotente">
+    Upsert por `(juego, fechaSorteo)` con `contentHash`, validación Zod antes de escribir, **aislado por juego** (un fallo no aborta los demás).
+  </Step>
+  <Step title="Cron">
+    `GET /api/cron/sincronizar-loterias` (autorización `Bearer CRON_SECRET` o sesión de admin) + entrada en `vercel.json`, ~3 pasadas al día tras las horas habituales de sorteo.
+  </Step>
+  <Step title="Endpoints para la app">
+    - `GET /api/loterias/resultados` — filtro por juego y rango de fechas, paginado con `nextPageToken`.
+    - `GET /api/loterias/resultados/[juego]/ultimo` — el último sorteo de un juego.
+  </Step>
+  <Step title="Admin">
+    `POST /api/loterias/sincronizar` (`secure`, rol `admin`) + página `app/admin/loterias/` con listado, botón "Sincronizar ahora" y estado de frescura por juego.
+  </Step>
+  <Step title="OpenAPI">
+    Registrar las rutas nuevas en `lib/openapi/paths/*` y pasar `npm run check-openapi`.
+  </Step>
+</Steps>
+
+### App (`Herrikonekt`)
+
+- Nuevo **acceso directo** "Loterías" en la rejilla de "Mi ciudad" (`data/widgets.ts` + icono + traducción en `i18n/translations.ts` es/eu/en).
+- Pantalla `app/loterias.tsx` (+ `hooks/use-loterias.ts`, patrón "hook de pantalla"): tarjetas con el último resultado de cada juego, y detalle por sorteo.
+- Capa de red en `lib/api/loterias.ts` vía `lib/subscriber` con una `key` estable para que funcione offline, igual que el resto de listados.
+- Tipos espejo en `lib/types/Loteria.ts` a partir del schema del server.
+- Sin cambios nativos → se puede entregar como actualización OTA.
+
+## Qué haría falta para arrancarlo
+
+- [ ] Decidir el **plan y coste** de `loteriasapi.com` (el gratuito no cubre uso comercial).
+- [ ] Dar de alta `LOTERIASAPI_KEY` en las variables de entorno del server.
+- [ ] Confirmar que el equipo legal está conforme con mostrar resultados sin marca de SELAE.
+- [ ] Crear el change de OpenSpec `ingesta-loterias` en `herrikonekt-server` (el estudio ya está redactado) y su gemelo en la app para el acceso directo y la pantalla.
+
+## Estado
+
+<Info>
+  **No planificada.** El estudio de viabilidad está hecho y el resultado es positivo. La implementación queda pendiente de priorización y de la decisión de coste sobre la fuente de datos de terceros.
+</Info>
