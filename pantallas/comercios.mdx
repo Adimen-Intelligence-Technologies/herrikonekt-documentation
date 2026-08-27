@@ -1,0 +1,61 @@
+---
+title: "Pantallas de comercios"
+sidebarTitle: "Comercios"
+description: "El directorio completo de comercios, la ficha de detalle de un comercio y el formulario para reclamarlo."
+icon: "store"
+---
+
+## Directorio de comercios
+
+**Ruta:** `comercios` · **Cómo se llega:** acceso directo "Comercios" en *Mi ciudad*, o "Ver todos" en Inicio, o desde una sugerencia de categoría del buscador.
+
+- **Hero verde** con flecha de volver, título "Nuestros comercios" y una ilustración de carrito, con franja de acento verde claro.
+- **Buscador** superpuesto sobre el hero.
+- **Carrusel de categorías** (tipos de comercio del municipio).
+- **Listado** de tarjetas de comercio (`BusinessCard`): a la izquierda nombre y CTA opcional; a la derecha la foto; el **botón del trébol** flotando; y, si el comercio tiene coordenadas, una **banda inferior con el mapa** y la dirección superpuesta. Scroll infinito.
+
+Puede llegar con una categoría preseleccionada (`comercios?categoryId=…`).
+
+Lleva a: Ficha de comercio.
+
+---
+
+## Ficha de comercio
+
+**Ruta:** `business/[id]` · **Cómo se llega:** tap en cualquier tarjeta de comercio (Inicio, directorio, favoritos, "Mis comercios", taxis).
+
+De arriba a abajo:
+
+| Sección | Contenido |
+| --- | --- |
+| **Hero** | Foto de portada a pantalla completa, flecha de volver, y **badge "PREMIUM"** dorado si el comercio está [destacado](/funcionalidades/comercios-destacados). |
+| **Tarjeta oscura** (`BusinessDarkCard`) | Nombre, **trébol grande**, y accesos de contacto: **Llamar**, **Email**, **Web**, **Facebook**, **Instagram** (solo los que el comercio tiene). En dorado si es premium. |
+| **Horario** | Por días de la semana. |
+| **Descripción y servicios** | Descripción en tu idioma si está traducida; lista de servicios / tratamientos. |
+| **Fotos** | Galería. |
+| **Banda de mapa** (`BusinessMapSection`) | Thumbnail del mapa centrado en la ubicación + dirección superpuesta. Tap → **"Cómo llegar"** (Apple/Google Maps). Si no hay coordenadas, muestra solo la dirección en un recuadro. |
+| **Reclamar / Reportar** (`BusinessClaimReportCards`) | Tarjeta **"Reclamar este comercio"** (o "Solicitud en revisión" si ya tienes una) y enlace **"Reportar comercio"** ("¿Este comercio ya no existe o hay datos erróneos?"). |
+
+Lleva a: Reclamar comercio (modal) · Reportar comercio (modal) · app de mapas externa.
+
+---
+
+## Reclamar comercio (modal)
+
+**Cómo se llega:** botón "Reclamar este comercio" en la ficha (necesita cuenta; sin sesión lleva al login).
+
+- Título "Reclama este comercio" y explicación de que hay que acreditar la titularidad.
+- Campo **Motivo** (obligatorio): "Cuéntanos por qué eres el titular".
+- **Adjuntar documento** (obligatorio): imagen o PDF, vía el selector de documentos del sistema.
+- El botón **Enviar solicitud** se activa solo cuando motivo y documento están completos.
+- Al enviar: confirmación "Solicitud enviada. Te avisaremos cuando la revisemos." y se cierra.
+
+El seguimiento del estado se hace en [Mis comercios](/pantallas/foro-y-cuenta#mis-comercios).
+
+---
+
+## Reportar comercio (modal)
+
+**Cómo se llega:** enlace "Reportar comercio" al final de la ficha.
+
+Formulario de 2 pasos: descripción de qué dato es incorrecto + tu email. Se **envía por correo** ("Reporte de comercio en Herrikonekt"); si no hay app de correo, muestra la dirección a la que escribir.

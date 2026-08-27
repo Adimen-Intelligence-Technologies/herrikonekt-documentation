@@ -1,0 +1,92 @@
+---
+title: "Pantallas del foro y de la cuenta"
+sidebarTitle: "Foro y cuenta"
+description: "El foro (La Plaza, una conversación, nueva conversación), las notificaciones, y las pantallas de cuenta: registro/login, editar perfil, favoritos y mis comercios."
+icon: "comments"
+---
+
+## Foro ("La Plaza")
+
+**Ruta:** `forum` · **Cómo se llega:** acceso directo "Foro" en *Mi ciudad*.
+
+- **Cabecera** del foro con flecha de volver, botón **"+"** (nueva conversación) y **campana** (notificaciones).
+- **Pestañas**:
+  - **La Plaza (Todos)** — el listado de conversaciones del municipio (`PostCard`), con scroll infinito y tirar para actualizar.
+  - **Siguiendo** — estado "muy pronto podrás seguir a personas y temas" (no operativa).
+  - **Categorías** — lista de temas; al elegir uno, "La Plaza" se filtra por ese tema.
+- Si no hay municipio, pide elegir uno.
+
+Lleva a: Conversación · Nueva conversación · Notificaciones.
+
+### Conversación
+
+**Ruta:** `forum/[id]`.
+
+- Banner "FORO · \<MUNICIPIO\>" y un sello ("¡NUEVO!" o "N 💬").
+- **Post**: avatar con iniciales, autor, fecha, botón de **reportar** (bandera), título, cuerpo y **etiquetas** (#tema).
+- **Respuestas**: lista de tarjetas con avatar, autor, fecha, cuerpo y reportar.
+- El contenido retirado por moderación aparece como "Contenido retirado por moderación".
+- Al pie: **caja de respuesta** (con sesión) o tarjeta "Inicia sesión para responder".
+
+### Nueva conversación
+
+**Ruta:** `forum/new` · **Cómo se llega:** botón "+" del foro (necesita cuenta y municipio).
+
+- Cabecera "Compartir con el municipio" y pastilla "EN \<MUNICIPIO\>".
+- **Título** (hasta 200 caracteres, con contador).
+- **Mensaje** (hasta 5.000, con contador).
+- **Temas**: pastillas seleccionables, **hasta 3**.
+- Botón **Publicar**. Al publicar, vuelve al listado del foro.
+
+---
+
+## Notificaciones
+
+**Ruta:** `notifications` · **Cómo se llega:** campana del foro, o "Notificaciones del foro" en Perfil.
+
+- Cabecera con flecha de volver, título "Notificaciones" y botón **marcar todas como leídas** (✓).
+- **Lista** de notificaciones ("\<persona\> ha respondido en una conversación") con fecha; las **no leídas** resaltadas con un punto.
+- Tocar una: la marca como leída y **abre la conversación** del foro.
+- Necesita cuenta. Scroll infinito y tirar para actualizar.
+
+---
+
+## Registro / Login
+
+**Cómo se llega:** pestaña Perfil sin sesión → "Iniciar sesión" o "Crear cuenta".
+
+- Formulario (`AuthForm`) con **email** y **contraseña** (mínimo 8 caracteres), enlace para alternar entre iniciar sesión y registrarse.
+- Botones sociales: **Continuar con Apple** y **Continuar con Google** (⚠️ Google falla hoy en iPhone — ver [Perfil](/funcionalidades/perfil)).
+- Errores claros: credenciales incorrectas, email ya registrado, sin conexión, etc.
+- Enlaces a Términos y Política de privacidad.
+
+---
+
+## Editar perfil
+
+**Ruta:** `edit-profile` · **Cómo se llega:** Perfil → "Editar perfil y preferencias".
+
+- Cabecera sobre fondo verde con el título.
+- **Datos editables** (`ProfileHero`): foto, nombre, **teléfono**, **ubicación** (localidad).
+- Botón **Cerrar sesión** al final (con confirmación).
+
+---
+
+## Favoritos
+
+**Ruta:** `favorites` · **Cómo se llega:** Perfil → "Mis comercios favoritos".
+
+- Cabecera "Mis favoritos".
+- **Lista** de tus comercios guardados (`HomeBusinessCard`). Tap → ficha del comercio.
+- Estado vacío: "Todavía no has marcado ningún comercio como favorito."
+
+---
+
+## Mis comercios
+
+**Ruta:** `mis-comercios` · **Cómo se llega:** Perfil → "¿Tienes un comercio? → Dar de alta / Reclamar".
+
+- Cabecera "Mis comercios" y subtítulo "Comercios de los que eres titular y solicitudes en curso".
+- **Tus comercios** — los que ya son tuyos, con una etiqueta de rol (**Titular** / **Gestor**). Tap → ficha.
+- **Tus solicitudes** — reclamaciones en curso, con estado (**Pendiente** / **Aprobada** / **Rechazada**) y, si fue rechazada, el **motivo del rechazo**.
+- Estados de carga / error / vacío ("Busca tu comercio y pulsa 'Reclamar este comercio' en su ficha").

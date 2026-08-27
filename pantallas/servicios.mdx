@@ -1,0 +1,69 @@
+---
+title: "Pantallas de servicios del municipio"
+sidebarTitle: "Servicios"
+description: "Farmacias de guardia, Esquelas y su detalle, Taxis, y las pantallas de detalle de una noticia y de un evento."
+icon: "map-location-dot"
+---
+
+## Farmacias de guardia
+
+**Ruta:** `pharmacy` · **Cómo se llega:** acceso directo "Farmacias de guardia" en *Mi ciudad*.
+
+- **Hero verde** con flecha de volver, título "Farmacias de guardia" y una ilustración de médico.
+- **Interruptor Día / Noche**: un toggle que desliza y cambia el color de toda la pantalla (modo noche oscuro).
+- **Lista de farmacias** de guardia para el modo elegido (`PharmacyCard`): nombre, **tramo** ("Guardia de día", "Guardia de noche", "Refuerzo…", "Voluntaria"), horario, dirección y botón **Llamar**.
+- Estados vacíos distintos para "no hay guardia hoy" y "no hay farmacia de noche", y una pista cuando no hay municipio resuelto.
+- Al pie: "Fuente: Colegio de Farmacéuticos de Gipuzkoa".
+
+---
+
+## Esquelas
+
+**Ruta:** `obituaries` · **Cómo se llega:** acceso directo "Esquelas" en *Mi ciudad*.
+
+- Cabecera "Esquelas" + **hero** con subtítulo "Esquelas recientes de tu municipio · \<municipio\>".
+- Sección "Recientes" con un contador y la lista de tarjetas (`EsquelaCard`). Scroll infinito y tirar para actualizar.
+- Si aún no hay municipio, estado "Buscando tu municipio…" explicando que las esquelas son de cada pueblo.
+
+Lleva a: Detalle de esquela.
+
+### Detalle de esquela
+
+**Ruta:** `obituaries/[id]`.
+
+Datos de la persona, **edad**, información de la **ceremonia**, **fuente** (funeraria) con enlace a **"Ver esquela original"**, y botón **Compartir**.
+
+---
+
+## Taxis
+
+**Ruta:** `taxis` · **Cómo se llega:** acceso directo "Taxis" en *Mi ciudad*.
+
+- **Hero verde** "Taxis" con ilustración de taxi.
+- **Lista** de taxis del municipio en tarjetas de comercio (`BusinessCard`): foto, nombre, dirección, botón **"Pedir taxi"** (llama), y el botón del trébol.
+- Si el municipio no tiene configurado el tipo "taxi" en el servidor: aviso "Aún no hay tipo de taxis configurado en el servidor".
+- No hay pantalla de detalle: la acción es llamar.
+
+---
+
+## Artículo de noticia
+
+**Ruta:** `article` · **Cómo se llega:** tap en una noticia de la pestaña Noticias.
+
+- **Foto de portada** con botones flotantes (volver, abrir original).
+- Tarjeta blanca superpuesta con **título** y **fecha**.
+- **Contenido completo** en HTML enriquecido: se descarga del servidor **en tu idioma** al abrir (con un spinner mientras carga).
+- Banda de aviso si el artículo se sirve en otro idioma.
+- Pie: botón **Compartir** y el dominio de la fuente.
+
+---
+
+## Detalle de evento
+
+**Ruta:** `agenda/[id]` · **Cómo se llega:** tap en un evento de la pestaña Eventos.
+
+- Cabecera con flecha de volver e iconos de **compartir** y **abrir en el navegador**.
+- **Imagen** del evento y **título**.
+- **Tarjeta de datos**: **Fecha** (o rango), **Hora** (si el evento la tiene), **Lugar** (si lo tiene).
+- **Contenido** del evento en HTML enriquecido.
+- Botones: **Añadir a calendario** (⚠️ hoy no funciona en iOS — ver [Agenda](/funcionalidades/agenda)) y **Abrir original**.

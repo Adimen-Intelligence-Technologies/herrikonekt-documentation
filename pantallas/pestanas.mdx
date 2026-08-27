@@ -1,0 +1,110 @@
+---
+title: "Pestañas principales"
+sidebarTitle: "Pestañas principales"
+description: "Qué hay en cada una de las cinco pestañas de la barra inferior (Inicio, Mi ciudad, Noticias, Eventos, Perfil), más la pantalla de onboarding y el selector de municipio."
+icon: "table-columns"
+---
+
+## Onboarding: "¿De dónde eres?"
+
+**Ruta:** `onboarding` · **Cuándo:** solo en el primer arranque, mientras no haya municipio.
+
+En pantalla:
+
+- Título "¿De dónde eres?" y subtítulo explicando que la app muestra comercios, farmacias de guardia y noticias de tu municipio.
+- **Selector de municipio** (`MunicipioPicker`): botón **"Usar mi ubicación"** o buscador por nombre / código postal con lista de resultados.
+- Enlace **"Continuar"** abajo: entra sin elegir (usa un municipio por defecto).
+
+Al elegir o continuar, va a la pestaña Inicio.
+
+---
+
+## Inicio
+
+**Ruta:** `(tabs)/index` · **Pestaña 1.**
+
+De arriba a abajo:
+
+| Elemento | Qué hace |
+| --- | --- |
+| **Cabecera** | Saludo "¡Hola vecin@!" · texto **"de \<municipio\>"** (tap → [Cambiar municipio](#cambiar-municipio)) · **botón de idioma** (banderita, arriba a la derecha; despliega las otras dos lenguas). |
+| **Buscador** | "Busca un comercio o categoría…". Sugerencias mientras escribes; abre el directorio filtrado. |
+| **Carrusel de categorías** | Las "bolitas" de tipos de comercio del municipio. Tocar una filtra el listado de abajo. |
+| **Anuncios destacados** | Carrusel de ofertas/anuncios de comercios del municipio. Tap → ficha del comercio o URL externa. |
+| **Listado de comercios** | Tarjetas de comercio de la categoría seleccionada (o todas), con scroll infinito. Cada tarjeta: nombre, foto, botón del trébol, y banda de mapa si hay coordenadas. |
+
+Lleva a: Cambiar municipio · Directorio de comercios · Ficha de comercio.
+
+---
+
+## Mi ciudad
+
+**Ruta:** `(tabs)/businesses` · **Pestaña 2.**
+
+- **Portada del municipio** (`TownHero`).
+- **Rejilla de accesos directos** ("Mis accesos directos"), en filas de dos: **Taxis**, **Comercios**, **Farmacias de guardia**, **Esquelas**, **Foro**. Cada tarjeta tiene su ilustración y una flecha.
+
+<Note>
+  Es la pantalla "hub" de servicios del municipio. El **directorio de comercios** no está aquí como lista: se abre desde el acceso directo "Comercios".
+</Note>
+
+Lleva a: Directorio de comercios · Farmacias de guardia · Esquelas · Taxis · Foro.
+
+---
+
+## Noticias
+
+**Ruta:** `(tabs)/news` · **Pestaña 3.**
+
+- **Hero verde** "Noticias" con ilustración.
+- Si el ayuntamiento no publica en tu idioma, **banda de aviso** ("Sin feed en tu idioma").
+- **Listado** de tarjetas de noticia (`NewsCard`): imagen, titular y antigüedad relativa ("Ahora mismo", "Ayer", "Hace 3 días"). Scroll infinito y tirar para actualizar.
+
+Lleva a: Artículo de noticia.
+
+---
+
+## Eventos
+
+**Ruta:** `(tabs)/agenda` · **Pestaña 4.**
+
+- **Hero verde** "Agenda" con ilustración.
+- Banda de aviso de idioma si aplica.
+- **Mini-calendario del mes** (`MiniCalendar`): un punto en los días con eventos; flechas para cambiar de mes; tocar un día filtra la lista.
+- **"Próximos eventos"** con un contador y la lista de tarjetas de evento (`EventCard`). Scroll infinito y tirar para actualizar.
+
+Lleva a: Detalle de evento.
+
+---
+
+## Perfil
+
+**Ruta:** `(tabs)/profile` · **Pestaña 5.** Muestra un **punto rojo** con el número de notificaciones del foro sin leer.
+
+**Sin sesión:** pantalla de bienvenida ("¡Hooola! ¿Eres nuevo en el barrio?") con **Iniciar sesión** / **Crear cuenta** → formulario de [registro/login](/pantallas/foro-y-cuenta#registro-login).
+
+**Con sesión:**
+
+| Bloque | Contenido |
+| --- | --- |
+| Cabecera de perfil | Foto (editable), nombre. |
+| "Miembro desde" | Fecha de alta. |
+| **Mis comercios favoritos** | Nº total → [Favoritos](/pantallas/foro-y-cuenta#favoritos). |
+| **Notificaciones del foro** | Nº sin leer → [Notificaciones](/pantallas/foro-y-cuenta#notificaciones). |
+| **Editar perfil y preferencias** | → [Editar perfil](/pantallas/foro-y-cuenta#editar-perfil). |
+| **¿Tienes un comercio?** | "Dar de alta" / "Reclamar" → [Mis comercios](/pantallas/foro-y-cuenta#mis-comercios). |
+| **Enviar mensaje** | Feedback al equipo. |
+| **Compartir datos de uso** | Interruptor de opt-out de analítica (solo si está configurada). |
+| **Cerrar sesión** | Con confirmación; vuelve a la bienvenida. |
+
+---
+
+## Cambiar municipio
+
+**Ruta:** `municipio` · **Cómo se llega:** tocando "de \<municipio\>" en la cabecera de Inicio.
+
+- Modal a pantalla completa (fondo verde) con título "Tu municipio" y "Ahora mismo: \<municipio\>".
+- El mismo **`MunicipioPicker`** que el onboarding: ubicación o buscador.
+- Botón de cerrar (X) arriba a la derecha.
+
+Al elegir, todo el contenido de la app pasa a ese municipio.

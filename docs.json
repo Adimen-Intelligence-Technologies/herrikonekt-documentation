@@ -41,6 +41,16 @@
             ]
           },
           {
+            "group": "Pantallas",
+            "pages": [
+              "pantallas/mapa",
+              "pantallas/pestanas",
+              "pantallas/comercios",
+              "pantallas/servicios",
+              "pantallas/foro-y-cuenta"
+            ]
+          },
+          {
             "group": "Proyecto",
             "pages": [
               "funcionalidades/estado"
