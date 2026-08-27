@@ -19,7 +19,8 @@
             "pages": [
               "index",
               "installation",
-              "primeros-pasos"
+              "primeros-pasos",
+              "glosario"
             ]
           },
           {
@@ -54,6 +55,14 @@
             "group": "Diseño",
             "pages": [
               "diseno/sistema-de-diseno"
+            ]
+          },
+          {
+            "group": "Arquitectura",
+            "pages": [
+              "arquitectura/app",
+              "arquitectura/backend",
+              "arquitectura/sincronizacion"
             ]
           },
           {

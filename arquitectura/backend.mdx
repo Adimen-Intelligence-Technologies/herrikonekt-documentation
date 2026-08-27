@@ -1,0 +1,100 @@
+---
+title: "El backend y su API"
+sidebarTitle: "El backend"
+description: "El servidor de Herrikonekt (herrikonekt-server): Next.js 16 + MongoDB + Zod v4, el wrapper runMiddleware como único punto de entrada, autenticación, el documento OpenAPI y la integración MCP."
+icon: "server"
+---
+
+La app móvil y el panel de administración consumen una **API REST** servida por el repo `herrikonekt-server` (privado). Esta página resume su arquitectura.
+
+## Stack
+
+| Pieza | Detalle |
+| --- | --- |
+| Framework | **Next.js 16** (App Router). Las rutas de API viven en `app/api/<path>/route.ts`. |
+| Base de datos | **MongoDB**, acceso perezoso vía `getModels()` en el contexto de la petición. |
+| Validación | **Zod v4** — los schemas de `lib/schemas/` (uno por dominio) son la fuente de verdad de las formas de petición y respuesta. |
+| Auth | **better-auth** (email + password) en `/api/auth/*`. |
+| Documentación | **OpenAPI 3.1** mantenido a mano en `lib/openapi/`. |
+| Despliegue | Vercel (crons en `vercel.json`). |
+
+## `runMiddleware` — el único punto de entrada
+
+Todo handler de API pasa por `runMiddleware`, que:
+
+- Valida la **entrada** y la **salida** con el schema Zod correspondiente.
+- Resuelve la **sesión** (si la hay).
+- Aplica **CORS** y **paginación**.
+- Mapea cualquier error a un **envelope estable** `{ message, code }`.
+- Abre MongoDB **de forma perezosa**: solo se conecta cuando un handler realmente toca la base de datos.
+
+Toda escritura valida su entrada con un schema Zod **antes** de persistir.
+
+## Autenticación
+
+| Cliente | Mecanismo |
+| --- | --- |
+| App móvil y panel | **Cookie de sesión** de better-auth. La app la inyecta con `authClient.getCookie()`; el server la lee con `getSession({ headers })`. |
+| Endpoint `/api/mcp` | **Claves de API** (Bearer). Es el único endpoint que las acepta. |
+| Tareas cron | `Authorization: Bearer <CRON_SECRET>`. |
+
+## El documento OpenAPI
+
+- Se construye a partir de los schemas de Zod, **nunca redefiniéndolos**.
+- Servido en `GET /api/openapi.json`.
+- Renderizado con **Scalar** en `GET /api/docs` (explorador interactivo).
+- Se verifica con `npm run check-openapi` (en CI). Toda ruta nueva debe registrarse en `lib/openapi/paths/*`.
+
+<Note>
+  Ante una duda contractual (campos, tipos, enums), la fuente de verdad son los schemas del servidor (`herrikonekt-server/lib/schemas/`), no los tipos espejo de la app (`lib/types/*` en el repo de la app, mantenidos a mano).
+</Note>
+
+## Dominios de la API
+
+Correspondencia aproximada con los clientes de la app (`lib/api/*`):
+
+| Dominio | Para qué |
+| --- | --- |
+| `comercios`, `ciudades`, `tipos-comercio`, `categorias` | Directorio de comercios y su taxonomía por municipio. |
+| `ofertas` | Anuncios / ofertas (global, se filtra por ciudad en el cliente). |
+| `favoritos` | Comercios guardados por usuario. |
+| `treboles` | Impulso diario + opt-in (contrato definido; la app aún no lo usa — ver [Tréboles](/funcionalidades/treboles)). |
+| `comercios/:id/claim`, `mis-comercios`, `comercio-miembros` | Reclamación y titularidad de comercios. |
+| `noticias`, `eventos`, `esquelas`, `farmacias-guardia` | Contenido oficial sincronizado — ver [Sincronización de contenido oficial](/arquitectura/sincronizacion). |
+| `foro` (posts, replies, tags, reports), `notificaciones` | Comunidad y avisos. |
+| `mi-perfil`, `devices` | Perfil del usuario y registro de dispositivos para push. |
+| `auth/*` | better-auth. |
+| `mcp` | Herramientas MCP para administradores (ver abajo). |
+| `cron/*` | Tareas programadas (ver [Sincronización](/arquitectura/sincronizacion)). |
+
+## Integración MCP
+
+El endpoint `/api/mcp` expone operaciones de comercios como **herramientas MCP** para administradores, autenticadas con clave de API:
+
+- Crear un comercio
+- Editar un comercio
+- Autocompletar los datos de un comercio
+- Autogenerar la foto de un comercio
+- Generar un enlace de subida de imágenes
+- Listar comercios / ciudades / categorías / tipos de comercio
+
+Es la vía por la que un asistente (p. ej. Claude) puede gestionar el catálogo sin pasar por el panel.
+
+## Panel de administración
+
+El panel web (mismo `herrikonekt-server`, rutas `app/admin/*`) permite gestionar:
+
+- **Comercios** — alta, edición, importación en lote, marcar como destacado.
+- **Ciudades y tipos de comercio** — la taxonomía por municipio.
+- **Noticias y foro** — revisión y moderación (reportes, borrado lógico).
+- **Claims** — aprobar/rechazar reclamaciones de comercios (crea la membresía).
+- **Historial de cambios** — cada escritura queda auditada (`HistorialCambio`).
+
+## Variables de entorno clave
+
+| Variable | Para qué |
+| --- | --- |
+| `EXPO_PUBLIC_API_URL` | (App) URL base de la API. Sin ella, `lib/client` falla al arrancar. |
+| `CRON_SECRET` | Autoriza las tareas programadas. |
+| Secretos de better-auth | Sesión. |
+| `AEMET_API_KEY`, `LOTERIASAPI_KEY`, … | Adaptadores de fuentes externas (futuras). |

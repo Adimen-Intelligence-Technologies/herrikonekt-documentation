@@ -1,0 +1,103 @@
+---
+title: "Glosario"
+sidebarTitle: "Glosario"
+description: "Los términos que se repiten en Herrikonekt y qué significa cada uno: municipio, comercio, tipo de comercio, trébol vs. favorito, destacado, claim, guardia, esquela, La Plaza y más."
+icon: "book"
+---
+
+<Note>
+  **Trébol ≠ favorito, ni destacado.** Es la confusión más habitual. Ver las tres entradas.
+</Note>
+
+## Contenido y territorio
+
+**Municipio / ciudad / pueblo**
+: El territorio al que pertenece todo el contenido. En el código es `ciudad` (`ciudadId`); en la UI es "municipio" o "pueblo". Se elige al abrir la app y se cambia desde la cabecera. Comercios, noticias, agenda, guardias, esquelas, taxis y foro son específicos de un municipio.
+
+**Municipio activo**
+: El municipio seleccionado en ese momento. Determina qué se ve en casi toda la app.
+
+**Comercio**
+: Un negocio de proximidad del directorio: ficha con horario, contacto, fotos, ubicación. Los taxis también se modelan como comercios de un tipo especial.
+
+**Tipo de comercio**
+: La categoría de un comercio (panadería, farmacia, moda…). Cada municipio define sus propios tipos; son las "bolitas" del carrusel de Inicio. En el código: `tipoComercio`.
+
+**Anuncio / oferta**
+: Promoción de un comercio que aparece en el carrusel "Anuncios destacados" de Inicio. En el código: `oferta`.
+
+## Guardar y destacar comercios
+
+**Favorito**
+: Comercio que guardas para tenerlo a mano. **Ilimitados.** Se marca con el **botón del trébol** de la tarjeta. Necesita cuenta. Se ve en *Perfil → Mis comercios favoritos*. Ver [Favoritos](/funcionalidades/favoritos).
+
+**Trébol**
+: El **símbolo de marca** del botón de guardar. Hoy, tocar el trébol = **marcar un favorito**. Existe además un concepto de "trébol impulso" (un impulso diario para un ranking del pueblo) que está en el servidor pero **no conectado en la app**. Ver [Tréboles](/funcionalidades/treboles).
+
+**Destacado / premium**
+: Un comercio que el equipo marca como destacado (`esDestacado`). Se ve con **badge dorado "PREMIUM"** y estilo dorado en su ficha. Es solo visual; el pago se gestiona fuera de la app. Ver [Comercios destacados](/funcionalidades/comercios-destacados).
+
+## Ser titular de un comercio
+
+**Claim / reclamación**
+: Solicitud de un usuario para acreditar que es el **titular** de un comercio, con un documento. La revisa el equipo. En el código: `comercioClaim`, con estado `pendiente` / `aprobada` / `rechazada`.
+
+**Titular / gestor**
+: Roles sobre un comercio una vez aprobada la claim: `owner` (titular) o `admin` (gestor). En el código: `comercioMiembro`.
+
+**Alta de comercio**
+: Petición para añadir un comercio **nuevo** que aún no está en la app. Hoy se envía por correo (no es un claim).
+
+**Sugerencia**
+: Propuesta de cambio sobre un comercio existente que un admin modera antes de publicar.
+
+**Mis comercios**
+: La pantalla que reúne los comercios de los que eres titular/gestor y tus solicitudes en curso.
+
+## Vida del pueblo
+
+**Guardia**
+: El turno de servicio de una farmacia. La pantalla "Farmacias de guardia" muestra las que están de guardia hoy.
+
+**Tramo**
+: El tipo de guardia: *guardia de día*, *guardia de noche*, *refuerzo de día*, *refuerzo de noche*, *voluntaria*.
+
+**Esquela**
+: Nota de fallecimiento publicada por una funeraria. Específica de cada municipio.
+
+**Agenda / eventos**
+: La programación oficial del municipio (pestaña "Eventos").
+
+## Comunidad
+
+**Foro**
+: El espacio de conversación de cada municipio.
+
+**La Plaza**
+: La pestaña principal del foro — todas las conversaciones del municipio.
+
+**Conversación / post**
+: Un hilo del foro, con título, mensaje, etiquetas y respuestas.
+
+**Tema / etiqueta / tag**
+: La categoría de una conversación. Hasta 3 por post.
+
+**Moderación**
+: Retirada de contenido inapropiado. El contenido moderado se sustituye por un aviso ("Contenido retirado por moderación").
+
+**Reporte**
+: Aviso de un usuario sobre contenido o un comercio con problemas.
+
+## Cuenta y técnica
+
+**Cuenta / sesión**
+: El registro del usuario. **Opcional**: la app funciona sin ella. Necesaria para favoritos, perfil, foro, notificaciones y claims.
+
+**OTA (Over-The-Air)**
+: Actualización de la app que llega automáticamente al abrirla, sin pasar por la tienda. Solo funciona para cambios que no tocan código nativo.
+
+**Municipio no resuelto**
+: Estado en que la app aún no sabe tu municipio (geolocalizando o pendiente de elegir). Varias pantallas muestran un estado específico para este caso.
+
+**Frescura del dato**
+: Para el contenido sincronizado, la app distingue *cuándo lo sincronizó Herrikonekt* de *cuándo lo publicó la fuente oficial*. Ver [Sincronización de contenido](/arquitectura/sincronizacion).

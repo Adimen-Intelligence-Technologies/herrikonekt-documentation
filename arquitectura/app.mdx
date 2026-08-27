@@ -1,0 +1,118 @@
+---
+title: "Arquitectura de la app"
+sidebarTitle: "La app"
+description: "Cómo está construida la app móvil de Herrikonekt: stack (Expo SDK 57), estructura de carpetas, el patrón 'hook de pantalla', estado con zustand, la capa de red con caché offline, persistencia y autenticación."
+icon: "layer-group"
+---
+
+La app es un proyecto **Expo / React Native**, solo iOS y Android (sin versión web).
+
+## Stack
+
+| Pieza | Versión / detalle |
+| --- | --- |
+| Expo SDK | **57** (`react-native` 0.86, `react` 19.2) |
+| Router | **expo-router 6**, con `typedRoutes` y `reactCompiler` activos |
+| Lenguaje | TypeScript estricto, alias `@/*` → raíz |
+| Estado | **zustand + immer** (slices por dominio) + un context (`LanguageContext`) |
+| Red | `lib/client` (fetch tipado) + `lib/subscriber` (caché) |
+| Auth | **better-auth** + `@better-auth/expo` (sesión opcional) |
+| i18n | `i18n/translations.ts` — es / eu / en, vía `useLanguage()` |
+| Analítica | PostHog, con opt-out |
+| Mapas | `@maplibre/maplibre-react-native` |
+| Chequeos | `npm run lint` (ESLint, `--max-warnings 0`) y `npm run typecheck` (`tsc --noEmit`), ambos en CI. Sin test runner. |
+
+## Estructura de carpetas
+
+| Carpeta | Contiene |
+| --- | --- |
+| `app/` | Rutas de expo-router (file-based). `app/(tabs)/` las pestañas, `app/<recurso>/[id].tsx` los detalles. |
+| `components/` | UI. Los componentes de más de ~200 líneas se parten en piezas reutilizables. |
+| `hooks/` | **Toda la lógica no trivial.** Ver "hook de pantalla" abajo. |
+| `lib/` | `client.ts` y `subscriber.ts` (red), `cache.ts` (SQLite), `auth-client.ts`, `api/*` (un cliente por dominio), `types/*` (tipos espejo del servidor) y helpers. |
+| `store/` | El store de zustand: `index.ts` + `slices/` (uno por dominio). |
+| `constants/` | Design tokens: `colors.ts`, `typography.ts`, `layout.ts`, y paletas seccionales (`events.ts`, `esquelas.ts`, `profile.ts`). Ver [Sistema de diseño](/diseno/sistema-de-diseno). |
+| `context/` | `LanguageContext` (idioma activo). |
+| `i18n/` | Las traducciones. |
+| `data/` | Datos estáticos: `widgets.ts` (los accesos directos), y mocks heredados. |
+
+## El patrón "hook de pantalla"
+
+Para rutas con estado o derivaciones no triviales, la lógica va en un hook `use-<nombre>-screen.ts` que devuelve el estado y los handlers; **la pantalla queda solo con JSX y estilos**.
+
+```
+app/pharmacy.tsx        ← solo render
+hooks/use-pharmacy-screen.ts  ← estado, toggle día/noche, handlers
+```
+
+Ejemplos reales: `use-business-detail-screen.ts`, `use-profile-home-screen.ts`, `use-my-businesses-screen.ts`, `use-edit-profile-screen.ts`, `use-favorites-screen.ts`.
+
+## Estado global (zustand)
+
+`store/index.ts` compone un store con la middleware **immer** (`enableMapSet()` para el `Set` de favoritos). Un slice por dominio:
+
+`agenda` · `businesses` · `business-categories` · `news` · `esquelas` · `pharmacy-guardia` · `user-location` · `favoritos` · `forum` · `notifications` · `mis-comercios`
+
+Cada slice guarda `items` + un `status` (`idle` / `loading` / `loadingMore` / `success` / `error`) + paginación. Los hooks de `lib/api/*` son los únicos que escriben en los slices.
+
+<Note>
+  El **estado nuevo** va a zustand + immer. Los contexts actuales se respetan pero no se crean nuevos sobre stores vivos.
+</Note>
+
+## Capa de red
+
+**Regla: nada de `fetch` directo.** Todo HTTP pasa por `lib/client`; los GET que deben funcionar offline, por `lib/subscriber`.
+
+### `lib/client` — fetch tipado
+
+```ts
+client<TOut, TBody>('/comercios/:id', {
+  method: 'GET',
+  params: { id },              // reemplaza :id en la ruta
+  searchParams: { page, limit },
+  data: body,                  // JSON o FormData (multipart)
+  secure: true,                // añade la cookie de sesión
+})
+```
+
+- Resuelve la URL base de `EXPO_PUBLIC_API_URL` (o del server local en dev si `EXPO_PUBLIC_LOCAL_API_PORT` está definido).
+- Con `secure: true` inyecta la sesión de better-auth como cabecera `Cookie` (nunca Bearer).
+- Los errores se normalizan a `ApiError { status, body, url }`.
+- No loggea headers ni body (llevan el token de sesión).
+
+### `lib/subscriber` — caché "cache-then-server"
+
+Para GETs, con una `key` estable (ej. `businesses:list:v4:{page}`):
+
+1. Emite primero `{ from: 'cache' }` si hay algo cacheado y fresco.
+2. Luego emite `{ from: 'server' }` con el dato de red y actualiza la caché.
+
+La caché (`lib/cache.ts`) es **SQLite** (`herrikonekt-cache.db`, tabla `cache(key, data, expiresAt)`):
+
+- TTL por defecto **30 días** (generoso: la app debe funcionar offline).
+- Overrides por prefijo: `pharmacy:` 12 h, `news:` / `eventos:` 24 h, `notifications:` 60 s.
+- No-op en web. Cualquier error de caché se degrada a "miss" — nunca rompe el flujo de red.
+- `clearCache()` se llama al cerrar sesión.
+
+## Persistencia
+
+| Dato | Mecanismo |
+| --- | --- |
+| Credenciales, token de sesión | `expo-secure-store` (prefijo `herrikonekt`) |
+| Caché de GETs | `expo-sqlite` |
+| Preferencias no sensibles (idioma, municipio elegido) | `@react-native-async-storage/async-storage` |
+
+Regla: credenciales **nunca** en AsyncStorage; datos críticos nunca solo en SQLite (es caché, no fuente de verdad).
+
+## Autenticación
+
+- **Sesión opcional**: la app entera funciona sin login.
+- `lib/auth-client.ts` — `authClient` de better-auth con el plugin de Expo: guarda la cookie de sesión en SecureStore y habla con `${server}/api/auth/*`. **No importa nunca `lib/client`** (evita un ciclo).
+- `hooks/use-auth.ts` — único punto de consumo en UI: `user`, `signIn`, `signUp`, `signOut` (con errores mapeados a `t.account.*`). `signOut` limpia también la caché SQLite y desregistra el push token.
+- Social: Apple y Google vía `@react-native-google-signin/google-signin` (requiere client IDs; ver [Estado del proyecto](/funcionalidades/estado)).
+
+## Gotchas
+
+- `app.json` activa `experiments.reactCompiler` y `typedRoutes` — el código nuevo debe ser compatible con ambos (rutas tipadas, sin mutaciones que rompan el compiler).
+- `runtimeVersion.policy = "appVersion"` + `expo-updates`: las actualizaciones OTA solo llegan dentro de la misma versión de app.
+- Los cambios de **código nativo** (plugins nuevos en `app.json`) necesitan un build EAS; no se entregan por OTA.
