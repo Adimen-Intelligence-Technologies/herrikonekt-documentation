@@ -11,6 +11,45 @@ Resumen del estado de la app a partir del código y de los cambios de OpenSpec d
   Convención: **Listo** = funciona en la app · **En curso** = parcialmente hecho o pendiente de verificación · **Pendiente** = definido pero no operativo.
 </Note>
 
+## Cómo vamos
+
+<Note>
+  **Fase 1** = la app que existe hoy (todo lo de *Funcionalidades*), terminada y verificada en dispositivo.
+  **Fase 2** = las [funcionalidades futuras](/futuro/gasolineras) y lo aplazado (foro "Siguiendo", alertas de noticias, monetización).
+</Note>
+
+```mermaid
+pie showData
+    title Funcionalidades de Fase 1
+    "Terminado" : 18
+    "En curso (falta verificar)" : 4
+    "Falta" : 3
+```
+
+El alcance funcional de Fase 1 está **~85 % hecho**: 18 funcionalidades terminadas, 4 a falta solo de verificación en dispositivo, y 3 aún por implementar (tréboles, "Añadir a calendario", Google Sign-In en iOS). El camino a la salida es sobre todo **verificación** y **un build nativo**.
+
+### Camino a la salida de Fase 1
+
+```mermaid
+flowchart LR
+    P1["1 · Verificar en\ndispositivo los changes\ncasi listos"] --> P2["2 · Build EAS con\nexpo-calendar +\niosClientId de Google"]
+    P2 --> P3["3 · Implementar y QA:\nAñadir a calendario +\nGoogle Sign-In iOS"]
+    P1 --> P5["5 · Conectar tréboles\nal servidor (opt-in\n+ un trébol/día)"]
+    P4["4 · Servidor de mapas:\ncoordenadas + estilo\nde marca"] -.-> SALIDA(["Salida de Fase 1"])
+    P3 --> SALIDA
+    P5 --> SALIDA
+```
+
+| Paso | Qué es | Estado |
+| --- | --- | --- |
+| 1 | Verificar en dispositivo: reclamar comercio (envío multipart), rendimiento de listados, tipografía | 🟡 En curso |
+| 2 | Un build EAS que incluya `expo-calendar` + `iosClientId` de Google | 🔴 Pendiente |
+| 3 | Implementar y QA de "Añadir a calendario" y "Google Sign-In iOS" con ese build | 🔴 Pendiente |
+| 4 | Follow-ups de servidor de mapas: coordenadas de comercios + estilo de mapa de marca | 🟡 En curso |
+| 5 | Conectar tréboles al servidor: opt-in en el perfil + modelo "un trébol al día" | 🔴 Pendiente |
+
+Fuera de Fase 1 (van a Fase 2): alta de comercio por API, foro "Siguiendo", filtros/alertas de noticias, monetización. El seguimiento operativo de todo esto está en el change `roadmap-pendientes` de OpenSpec.
+
 ## Terminado
 
 | Funcionalidad | Notas |
