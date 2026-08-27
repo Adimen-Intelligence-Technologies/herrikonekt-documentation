@@ -26,6 +26,7 @@
             "group": "Funcionalidades",
             "pages": [
               "funcionalidades/comercios",
+              "funcionalidades/comercios-destacados",
               "funcionalidades/favoritos",
               "funcionalidades/treboles",
               "funcionalidades/tu-comercio",

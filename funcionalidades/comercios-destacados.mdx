@@ -1,0 +1,53 @@
+---
+title: "Comercios destacados (premium)"
+sidebarTitle: "Comercios destacados"
+description: "Qué es hoy el distintivo 'premium' de un comercio en Herrikonekt: un comercio marcado como destacado desde el panel se muestra con estilo dorado. No hay ningún flujo de pago ni monetización dentro de la app."
+icon: "crown"
+---
+
+Herrikonekt tiene un único elemento "premium" en funcionamiento hoy: el **distintivo de comercio destacado**. Es puramente visual. **No hay pagos, suscripciones ni ninguna monetización dentro de la app.**
+
+## Qué es un comercio destacado
+
+Un comercio puede estar marcado como **destacado** ("premium"). En los datos que recibe la app esto son dos campos del comercio:
+
+| Campo | Significado |
+| --- | --- |
+| `esDestacado` | `true` cuando el comercio está marcado como destacado **en el panel de administración**. |
+| `destacado` | Payload de la "sesión de destacado" (fechas e importes), o `null` si no hay. **La app no lo usa**: recibe el dato pero no lo muestra. |
+
+Es decir: la decisión de destacar un comercio, el periodo y el importe se gestionan **en el servidor / panel**, no en la app. La app solo lee el booleano `esDestacado` y cambia el aspecto.
+
+## Cómo se ve en la app
+
+Cuando `esDestacado` es `true`, el comercio usa la paleta dorada de marca (`PremiumGold`: gradiente `#AD8B27 → #F7E582 → #AD8B27`):
+
+- **En Inicio y en el directorio** — la tarjeta (`HomeBusinessCard`) tiene fondo dorado y un **badge "PREMIUM"** sobre la imagen.
+- **En la ficha de detalle** — badge "PREMIUM" sobre la foto de portada, y la **tarjeta de contacto** (`BusinessDarkCard`: nombre, trébol, llamar/email/web/redes) se pinta en dorado en vez de en verde.
+
+No cambia el contenido ni el orden en los listados: solo el estilo.
+
+## Qué NO existe hoy
+
+- **Ningún flujo de pago dentro de la app** — ni para comercios ni para usuarios. No hay pantalla de planes, paywall, ni compra in-app.
+- **Los importes del destacado no se muestran** en la app (el campo `destacado` llega pero se ignora).
+- **No hay un tier "premium" de usuario** — todas las cuentas son iguales.
+- **Los anuncios / ofertas** del carrusel de Inicio no tienen distinción de "patrocinado" ni "premium" en el contrato real del servidor (el tipo `OfertaEntity` no lo contempla).
+
+## Estado de la monetización
+
+<Info>
+  **No implementada.** El SDK de compras **`react-native-purchases` (RevenueCat) está instalado** en el proyecto (`package.json`, `^10.7.0`) pero **sin ningún uso** — ni un `import`, ni configuración en `app.json`. Se mantiene a propósito "a la espera de la feature premium" (decisión de `audit-reuse-cleanup-performance`, 2026-08-24); no se desinstala hasta confirmar que no hay plan a corto plazo.
+</Info>
+
+El modelo de negocio (cómo se cobra el destacado, si habrá suscripción, comisión o publicidad) **no está documentado** porque no está definido en el código. Cuando se decida, se documentará aquí y, si aplica, como su propio change de OpenSpec.
+
+## Estado
+
+<Note>
+  **Listo**: distintivo visual de comercio destacado (`esDestacado`) — badge "PREMIUM" y paleta dorada en tarjeta y ficha.
+</Note>
+
+<Warning>
+  **Pendiente / sin definir**: todo lo relativo a monetización — flujo de pago del destacado (hoy fuera de la app), planes de usuario, integración de RevenueCat, y el modelo de negocio en sí.
+</Warning>
