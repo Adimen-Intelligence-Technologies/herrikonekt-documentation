@@ -1,0 +1,45 @@
+---
+title: "Idioma por defecto al abrir la app"
+sidebarTitle: "Idioma por defecto"
+description: "Cómo decide Herrikonekt en qué idioma arrancar la primera vez: idioma del dispositivo si es uno soportado (es, eu, en), euskera como fallback, y persistencia en AsyncStorage."
+---
+
+La app soporta **tres idiomas**: español (`es`), euskera (`eu`) e inglés (`en`). Las traducciones viven en `i18n/translations.ts` y se consumen con `useLanguage()`.
+
+## Cómo se elige el idioma al abrir la app por primera vez
+
+Todo está en `context/LanguageContext.tsx`. La regla es:
+
+1. **Lee el idioma del dispositivo** con `getLocales()` de `expo-localization`.
+2. Si el código (`es`, `eu`, `en`) es uno de los soportados, la app arranca en ese idioma.
+3. Si no (por ejemplo, francés, alemán, chino...), **cae a euskera** como fallback.
+4. Una vez el usuario cambia el idioma desde el selector, la elección se guarda en `AsyncStorage` bajo la clave `herrikonekt.language.v1` y se restaura en aperturas posteriores.
+
+```ts
+function systemLanguage(): Language {
+  const code = getLocales()[0]?.languageCode;
+  return isLanguage(code) ? code : "eu";
+}
+```
+
+<Note>
+  El estado inicial se calcula en el `useState` de `LanguageProvider` con esa misma función, así que la primera pintura de la app ya sale en el idioma correcto — sin parpadeo a euskera.
+</Note>
+
+## Ejemplos
+
+| Idioma del dispositivo | Idioma al abrir la app |
+| --- | --- |
+| Español (España, México, Argentina...) | Español |
+| Euskera | Euskera |
+| Inglés | Inglés |
+| Francés, alemán, chino, árabe... | Euskera (fallback) |
+| Cualquiera, después de cambiarlo desde el selector | El elegido por el usuario (guardado en AsyncStorage) |
+
+## Por qué euskera como fallback y no español
+
+Porque Herrikonekt es una app de municipios vascos y el euskera es la lengua cooficial de la comunidad. Un dispositivo en un idioma no soportado (algo perfectamente plausible: la app no está traducida a muchos más) se encuentra con la lengua propia de los municipios a los que sirve antes que con la otra cooficial.
+
+## Cambiar de idioma más tarde
+
+El usuario puede cambiar de idioma en cualquier momento desde el selector del Perfil. La elección se persiste en AsyncStorage (clave `herrikonekt.language.v1`) y se restaura al volver a abrir la app. `AsyncStorage` se considera aceptable aquí porque la preferencia no es sensible.
