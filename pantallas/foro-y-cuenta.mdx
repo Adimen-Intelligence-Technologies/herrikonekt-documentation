@@ -7,7 +7,7 @@ icon: "comments"
 
 ## Foro ("La Plaza")
 
-**Ruta:** `forum` · **Cómo se llega:** acceso directo "Foro" en *Mi ciudad*.
+**Ruta:** `forum` · **Cómo se llega:** acceso directo "Foro" en _Mi ciudad_.
 
 - **Cabecera** del foro con flecha de volver, botón **"+"** (nueva conversación) y **campana** (notificaciones).
 - **Pestañas**:
@@ -22,7 +22,7 @@ Lleva a: Conversación · Nueva conversación · Notificaciones.
 
 **Ruta:** `forum/[id]`.
 
-- Banner "FORO · \<MUNICIPIO\>" y un sello ("¡NUEVO!" o "N 💬").
+- Banner "FORO · \<MUNICIPIO>" y un sello ("¡NUEVO!" o "N 💬").
 - **Post**: avatar con iniciales, autor, fecha, botón de **reportar** (bandera), título, cuerpo y **etiquetas** (#tema).
 - **Respuestas**: lista de tarjetas con avatar, autor, fecha, cuerpo y reportar.
 - El contenido retirado por moderación aparece como "Contenido retirado por moderación".
@@ -32,7 +32,7 @@ Lleva a: Conversación · Nueva conversación · Notificaciones.
 
 **Ruta:** `forum/new` · **Cómo se llega:** botón "+" del foro (necesita cuenta y municipio).
 
-- Cabecera "Compartir con el municipio" y pastilla "EN \<MUNICIPIO\>".
+- Cabecera "Compartir con el municipio" y pastilla "EN \<MUNICIPIO>".
 - **Título** (hasta 200 caracteres, con contador).
 - **Mensaje** (hasta 5.000, con contador).
 - **Temas**: pastillas seleccionables, **hasta 3**.
@@ -45,20 +45,41 @@ Lleva a: Conversación · Nueva conversación · Notificaciones.
 **Ruta:** `notifications` · **Cómo se llega:** campana del foro, o "Notificaciones del foro" en Perfil.
 
 - Cabecera con flecha de volver, título "Notificaciones" y botón **marcar todas como leídas** (✓).
-- **Lista** de notificaciones ("\<persona\> ha respondido en una conversación") con fecha; las **no leídas** resaltadas con un punto.
+- **Lista** de notificaciones ("\<persona> ha respondido en una conversación") con fecha; las **no leídas** resaltadas con un punto.
 - Tocar una: la marca como leída y **abre la conversación** del foro.
 - Necesita cuenta. Scroll infinito y tirar para actualizar.
 
 ---
 
-## Registro / Login
+## Login
 
-**Cómo se llega:** pestaña Perfil sin sesión → "Iniciar sesión" o "Crear cuenta".
+**Cómo se llega:** pestaña Perfil sin sesión → "Iniciar sesión".
 
-- Formulario (`AuthForm`) con **email** y **contraseña** (mínimo 8 caracteres), enlace para alternar entre iniciar sesión y registrarse.
-- Botones sociales: **Continuar con Apple** y **Continuar con Google** (⚠️ Google falla hoy en iPhone — ver [Perfil](/funcionalidades/perfil)).
-- Errores claros: credenciales incorrectas, email ya registrado, sin conexión, etc.
-- Enlaces a Términos y Política de privacidad.
+Pantalla dedicada (`LoginForm`), rediseñada sobre Figma con fondo blanco y botón de volver circular en la esquina superior izquierda. Orden de arriba a abajo:
+
+1. Título "Inicia sesión".
+2. Botones sociales **Continuar con Google** y **Continuar con Apple** (⚠️ Google falla hoy en iPhone — ver [Perfil](/funcionalidades/perfil); Apple solo se muestra en iOS).
+3. Separador "O continúa con".
+4. Campos **E-mail** y **Contraseña** (con toggle mostrar/ocultar).
+5. Enlace "¿Olvidaste la contraseña? Recupera tu cuenta" — de momento es solo visual, no hay flujo de recuperación implementado.
+6. Botón **Iniciar sesión**.
+7. Enlace "¿No tienes una cuenta todavía? Crea una cuenta", al final del todo, que lleva al formulario de registro.
+
+El contenido se centra verticalmente en la pantalla (el botón de volver queda fijo arriba) para no dejar aire de más en pantallas altas.
+
+**Validación y errores:**
+
+- El botón "Iniciar sesión" está deshabilitado (fondo al 60% de opacidad) hasta que el email tiene un formato válido y la contraseña no está vacía — evita el envío en blanco.
+- Si el login falla, el error se muestra en un banner con icono y fondo/borde en rojo tenue, y se resalta con borde rojo el campo implicado (solo el email si es un email inválido; email y contraseña si son credenciales incorrectas, porque no se sabe cuál de los dos falló).
+- El error desaparece en cuanto el usuario vuelve a escribir en cualquiera de los dos campos.
+
+## Registro
+
+**Cómo se llega:** pestaña Perfil sin sesión → "Crear cuenta", o desde el enlace al final del login.
+
+- Formulario (`AuthForm`) con social (**Continuar con Apple** / **Continuar con Google**), **nombre**, **email** y **contraseña** (mínimo 8 caracteres), checkbox de aceptación de Términos y Política de privacidad.
+- El botón de enviar solo se activa con el checkbox marcado.
+- Enlace "¿Ya tienes cuenta? Inicia sesión" que vuelve a la pantalla de login.
 
 ---
 
