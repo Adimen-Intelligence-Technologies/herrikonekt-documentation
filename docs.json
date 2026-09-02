@@ -62,6 +62,7 @@
             "pages": [
               "arquitectura/app",
               "arquitectura/backend",
+              "arquitectura/idioma",
               "arquitectura/sincronizacion"
             ]
           },
@@ -84,8 +85,5 @@
         ]
       }
     ]
-  },
-  "fonts": {
-    "family": "Albert Sans"
   }
 }
