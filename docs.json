@@ -31,7 +31,6 @@
               "funcionalidades/favoritos",
               "funcionalidades/treboles",
               "funcionalidades/tu-comercio",
-              "arquitectura/idioma",
               "funcionalidades/agenda",
               "funcionalidades/noticias",
               "funcionalidades/farmacias",
@@ -63,6 +62,7 @@
             "pages": [
               "arquitectura/app",
               "arquitectura/backend",
+              "arquitectura/idioma",
               "arquitectura/sincronizacion"
             ]
           },
@@ -85,8 +85,5 @@
         ]
       }
     ]
-  },
-  "fonts": {
-    "family": "Albert Sans"
   }
 }
