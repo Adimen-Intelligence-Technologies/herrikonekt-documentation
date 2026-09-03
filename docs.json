@@ -69,7 +69,8 @@
           {
             "group": "Proyecto",
             "pages": [
-              "funcionalidades/estado"
+              "funcionalidades/estado",
+              "funcionalidades/errores-conocidos"
             ]
           },
           {
