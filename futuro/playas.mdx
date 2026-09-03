@@ -39,7 +39,7 @@ Un pueblo se consideraría **"costero"** simplemente si tiene ≥ 1 playa (no ha
 ### Consideración legal
 
 - **Atribución** a cada fuente (CC-BY para Euskadi, AEMET, Puertos del Estado).
-- **Aviso de responsabilidad** en la ficha: *"consulta siempre la bandera física de la playa; este dato es informativo"*.
+- **Aviso de responsabilidad** en la ficha: _"consulta siempre la bandera física de la playa; este dato es informativo"_.
 
 ## Cómo se implementaría
 
@@ -56,6 +56,7 @@ Mismo patrón que **farmacias de guardia**: dato externo cacheado en Mongo por c
   </Step>
   <Step title="Servicio con adaptadores">
     `lib/services/playas/` con interfaz de adaptador y tres adaptadores:
+
     - **`opendata-euskadi`** — bandera + temperatura + aforo en tiempo real de la costa vasca.
     - **`aemet-playas`** — predicción nacional; rellena condiciones y `prevision`, **nunca fija la bandera**; requiere `AEMET_API_KEY`.
     - **`mareas`** — predicción de mareas por puerto → `mareasPuerto` (proveedor configurable con `PLAYAS_FUENTE_MAREAS`).

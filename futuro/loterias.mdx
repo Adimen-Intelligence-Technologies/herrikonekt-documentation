@@ -41,6 +41,7 @@ El patrón sería el mismo que ya usan **farmacias de guardia** y la **sincroniz
   </Step>
   <Step title="Servicio de ingesta con dos adaptadores">
     `lib/services/loterias/` con una interfaz común (`sincronizar`, `probar`) y un registro por nombre:
+
     - **`loteriasapi`** — cliente del API de terceros (`loteriasapi.com`), requiere `LOTERIASAPI_KEY`. Fuente principal.
     - **`selae-servicios`** — cliente de los endpoints no documentados de `loteriasyapuestas.es` con cabeceras de navegador realistas; **tolera el 403** y cede el turno al siguiente adaptador. Intento previo gratuito y autoritativo.
   </Step>
