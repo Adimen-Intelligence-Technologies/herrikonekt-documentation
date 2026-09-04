@@ -1,0 +1,159 @@
+---
+title: "Coche compartido en el foro: busca o ofrece plaza"
+sidebarTitle: "Coche compartido (oferta/demanda)"
+description: "Mejora en la categoría de coche compartido del foro para diferenciar si el usuario busca plaza o la ofrece, facilitando el matching entre conductores y pasajeros."
+icon: "car"
+---
+
+## Propósito
+
+La categoría de **coche compartido** en el foro "La Plaza" es un espacio donde vecinos comparten viajes, pero actualmente no hay forma de **diferenciar rápidamente si un post es una oferta o una demanda**. Esta funcionalidad añadiría un **tipo de post** ("Busco plaza" / "Ofrezco plaza") para mejorar el matching entre conductores y pasajeros.
+
+## Cómo funcionaría
+
+### 1. Al crear un post en la categoría "Coche compartido"
+
+Al publicar un nuevo post, se mostraría un **selector adicional** con dos opciones:
+
+- 🚗 **Ofrezco plaza**: El usuario tiene un coche y busca pasajeros para compartir viaje.
+- 🙋 **Busco plaza**: El usuario busca compartir coche como pasajero.
+
+Esta selección sería **obligatoria** para crear un post en esta categoría.
+
+### 2. Visualización en el listado del foro
+
+Cada post en la categoría de coche compartido mostraría:
+
+- El **badge o etiqueta** clara: "Ofrezco" (color verde) o "Busco" (color azul).
+- El título del post (ej: "Ofrezco plaza Donostia → Bilbao, jueves y viernes").
+- Autor y fecha.
+- Un pequeño icono diferenciador (🚗 para oferta, 👤 para demanda).
+
+### 3. Filtrado automático
+
+En la pestaña de **Categorías** o en "La Plaza", el usuario podría:
+
+- Ver **solo ofertas** (posts de personas que ofrecen viajes).
+- Ver **solo demandas** (posts de personas que buscan pasajeros).
+- Ver **todos** (por defecto).
+
+Esto permitiría a los conductores buscar pasajeros y a los pasajeros buscar viajes más fácilmente.
+
+### 4. En el detalle del post
+
+Al abrir un post, se vería claramente:
+
+```
+🚗 OFREZCO PLAZA
+
+Salida: Donostia (Plaza Guipúzcoa)
+Destino: Bilbao (Plaza Moyúa)
+Día: Jueves y viernes
+Hora: 8:00 AM
+Autor: Josema
+Plazas disponibles: 3
+```
+
+o
+
+```
+🙋 BUSCO PLAZA
+
+Salida: Tolosa
+Destino: Gasteiz
+Día: Martes, miércoles, jueves
+Hora: 7:30 AM
+Autor: Ana
+Flexible con horarios
+```
+
+## Casos de uso
+
+**Caso 1: Conductor buscando pasajeros**
+> Mikel publica "Ofrezco plaza: Elgoibar → Donostia, lunes a viernes 8:30 AM". Su post aparece con badge verde 🚗. Ana, que busca pasajeros, filtra por "Ofrezco" y encuentra a Mikel.
+
+**Caso 2: Pasajero buscando viaje**
+> Leire publica "Busco plaza: Tolosa → Bilbao, cualquier día". Su post aparece con badge azul 🙋. Iñigo, que hace ese trayecto, lo ve y se ofrece en los comentarios.
+
+**Caso 3: Rueda de viajes regulares**
+> Varios vecinos publican "Ofrezco plaza: Pueblo → Bilbao" en diferentes horarios. Los que buscan pueden filtrar por "Ofrezco" y elegir el horario que les conviene.
+
+## Beneficios
+
+✓ **Claridad inmediata**: Saber si es oferta o demanda de un vistazo.
+✓ **Mejor búsqueda**: Filtrar por tipo de post ahorra tiempo.
+✓ **Más conversión**: Facilita el matching entre conductores y pasajeros.
+✓ **Comunidad activa**: Incentiva compartir coches dentro del municipio.
+✓ **Datos estructurados**: Permite análisis de rutas populares (ej: si hay muchas demandas Donostia → Bilbao).
+✓ **Sostenibilidad**: Promueve movilidad compartida y reduce emisiones.
+
+## Consideraciones de diseño
+
+- Los **badges de color** deben ser consistentes con el sistema de diseño de Herrikonekt:
+  - Verde (#4ACD6F o similar) para "Ofrezco"
+  - Azul (#4A5FCD o similar) para "Busco"
+- Los **iconos** deben ser de lucide-react: `car` y `user` o `hand-raised`.
+- El **selector al crear** debe ser visible pero no intrusivo (un radio button o segmented control).
+- El filtrado debe ser **instantáneo** y mostrar el número de posts (ej: "Ofrezco (12)" | "Busco (8)").
+- Funcionabilidad en **modo claro y oscuro**.
+
+## Implementación técnica
+
+### Backend
+
+- Agregar campo `tipoPost: enum['ofrezco', 'busco']` al modelo de posts en la colección `ForumPost`.
+- Este campo debe ser **obligatorio para la categoría "Coche compartido"** (opcional para otras).
+- Actualizar endpoint POST `/foro/posts` para validar este campo cuando la categoría sea "Coche compartido".
+- Crear índice en `tipoPost` para filtrado rápido.
+
+### Frontend
+
+- Agregar **segmented control** o radio buttons al formulario de crear post.
+- Mostrar el badge junto al título en el listado de posts.
+- Implementar **filter tabs** en la pestaña de categoría de coche compartido.
+- Actualizar el hook de pantalla del foro para leer el filtro seleccionado.
+- Query a backend: `GET /foro/posts?categoria=coche-compartido&tipo=ofrezco` (o `&tipo=busco`).
+
+### Base de datos
+
+- Migración para agregar `tipoPost` a posts existentes (puede ser `null` para posts de antes).
+- Índices: `{ categoria: 1, tipoPost: 1 }` para búsqueda eficiente.
+
+## Campos adicionales (opcional - Fase 2)
+
+En futuras versiones, se podrían añadir campos más detallados:
+
+- **Salida y destino**: Ubicaciones (autocomplete desde mapa).
+- **Horario**: Día(s) de la semana, hora.
+- **Plazas disponibles** (solo en ofertas): ¿Cuántas personas caben?
+- **Perfil del viajero**: ¿Fuma? ¿Mascotas? ¿Música?
+- **Flexibilidad**: ¿Horario fijo o flexible?
+
+Esto podría quedar como campos de un formulario expandido en una siguiente fase.
+
+## Próximas fases
+
+**Fase 1 (MVP)**
+- Selector "Ofrezco" / "Busco" al crear post.
+- Badge en listado de posts.
+- Filtro por tipo en la categoría de coche compartido.
+
+**Fase 2**
+- Campos adicionales: origen, destino, horario, plazas disponibles.
+- Búsqueda geográfica o por horario.
+- Notificaciones: "Alguien busca pasajeros en tu ruta" (si ofreces) o "Alguien ofrece en tu ruta" (si buscas).
+
+**Fase 3**
+- Matching automático basado en rutas y horarios.
+- Ranking de fiabilidad (puntuación de viajeros frecuentes).
+- Integración con contactos: "María comparte viaje regularmente".
+
+## Estado
+
+<Warning>
+  **No planificado**: Esta es una mejora de la categoría "Coche compartido" del foro para facilitar el matching entre conductores y pasajeros. Su implementación depende de validación con usuarios y priorización en el roadmap.
+</Warning>
+
+<Note>
+  **Aplicabilidad**: Esta funcionalidad es específica de municipios pequeños/medianos donde el transporte compartido es común. Podría adaptarse a otros tipos de categorías del foro (viajes, compraventa, búsqueda de servicios) en el futuro.
+</Note>
