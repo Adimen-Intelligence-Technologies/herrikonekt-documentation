@@ -1,0 +1,80 @@
+---
+title: "Distinción visual de comentarios del ayuntamiento en el foro"
+sidebarTitle: "Distinción del ayuntamiento"
+description: "Sistema visual para diferenciar los comentarios del ayuntamiento en el foro municipal con badge o color distintivo que los identifique claramente."
+icon: "medal"
+---
+
+## Propósito
+
+Actualmente, en el foro "La Plaza", no hay forma de identificar visualmente si un comentario o respuesta proviene de una cuenta oficial del ayuntamiento. Esta funcionalidad añadiría un **badge o color distintivo** a los posts del ayuntamiento para que los usuarios reconozcan inmediatamente que es comunicación oficial del municipio.
+
+## Cómo funcionaría
+
+### Identificación de cuentas del ayuntamiento
+
+- El **panel de administración** permitiría marcar una cuenta de usuario como "cuenta oficial del ayuntamiento".
+- Solo los administradores municipales pueden crear y asignar esta etiqueta.
+- La cuenta tendría un campo adicional: `esAyuntamiento: boolean`.
+
+### Visualización en el foro
+
+Los **posts y respuestas** de cuentas del ayuntamiento mostrarían:
+
+- Un **badge visual** (ej: "🏛️ Ayuntamiento" o "Oficial") junto al nombre del autor.
+- Un **color de fondo sutil** diferenciador (ej: tonalidad azul clara, verde corporativa, o naranja).
+- Un **icono pequeño** oficial junto al avatar del usuario.
+
+### Ubicación del indicador
+
+Tanto en la **lista de conversaciones** como en el **detalle de una conversación**:
+
+- El post inicial mostraría el badge.
+- Cada respuesta dentro de una conversación mostraría el badge.
+- El autor y la fecha estarían acompañados del indicador visual.
+
+## Beneficios
+
+✓ **Confianza**: Los ciudadanos saben cuándo leen comunicación oficial.
+✓ **Transparencia**: Separa claramente las respuestas del ayuntamiento de las de otros usuarios.
+✓ **Cuidado comunitario**: Evita confusión entre opiniones ciudadanas e información oficial.
+✓ **Engagement municipal**: Anima al ayuntamiento a participar y responder en el foro.
+✓ **Credibilidad**: Las respuestas del ayuntamiento tienen mayor peso en las decisiones de los usuarios.
+
+## Consideraciones de diseño
+
+- El badge debe ser **sutil pero visible**: llamar la atención sin ser intrusivo.
+- El color debe **contrastar bien** con la paleta de Herrikonekt.
+- Debe funcionar en **modo claro y modo oscuro**.
+- En dispositivos pequeños (móvil), considerar un **icono pequeño** antes que texto largo.
+- En la lista de conversaciones, mostrar un pequeño indicador para identificar rápidamente posts del ayuntamiento.
+- El color sugerido es una tonalidad **azul corporativa** (#4A5FCD) con suavidad.
+
+## Implementación técnica
+
+### Backend
+
+- Agregar campo `esAyuntamiento: boolean` al modelo de usuarios.
+- Crear endpoint en el panel admin para marcar/desmarcar cuentas como oficiales.
+- Incluir este dato en la respuesta API del foro (posts y respuestas).
+
+### Frontend
+
+- Actualizar componentes de post y respuesta para mostrar el badge condicionalmente.
+- Agregar estilos CSS para el badge y el fondo diferenciado.
+- Asegurar accesibilidad (ARIA labels).
+
+## Próximas fases
+
+1. Validar con ayuntamientos si les interesa esta funcionalidad.
+2. Diseñar el badge y seleccionar color corporativo en el sistema de diseño.
+3. Actualizar backend para almacenar la bandera `esAyuntamiento`.
+4. Implementar campo en formulario de administración.
+5. Actualizar UI del foro para mostrar el badge.
+6. Testing en dispositivos reales (iOS y Android).
+
+## Estado
+
+<Warning>
+  **No planificado**: Esta es una mejora futura para mejorar la identificación de comunicación oficial en los foros municipales. Su implementación depende de feedback de los municipios y priorización en el roadmap.
+</Warning>
