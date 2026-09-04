@@ -1,0 +1,133 @@
+---
+title: "Gamificación: badges y premios por participación en el foro"
+sidebarTitle: "Gamificación y badges"
+description: "Sistema de gamificación que otorga status y premios a usuarios activos en el foro según sus likes y comentarios, incentivando la participación comunitaria."
+icon: "trophy"
+---
+
+## Propósito
+
+Para fomentar la participación activa en el foro "La Plaza" y recompesar a los usuarios más comprometidos con la comunidad, esta funcionalidad implementaría un **sistema de gamificación** basado en likes y comentarios. Los usuarios recibirían **badges, niveles y status** que reflejen su contribución a la comunidad.
+
+## Cómo funcionaría
+
+### Sistema de puntos
+
+- **1 like recibido** = 1 punto de participación.
+- **1 comentario publicado** = 2 puntos (incentiva crear contenido).
+- **1 respuesta a un comentario** = 3 puntos (estimula conversación).
+- El usuario puede ver su **puntuación total** en el perfil.
+
+### Badges y niveles
+
+Los usuarios desbloquerían badges según hitos:
+
+| Hito | Badge | Requisito |
+|------|-------|----------|
+| Primer paso | 🁑 Novato | 10 puntos |
+| Participante activo | 🏆 Miembro | 50 puntos |
+| Voz de la comunidad | 🎤 Influencer local | 150 puntos |
+| Líder comunitario | 🧅 Experto | 300 puntos |
+| Pillar de la comunidad | 👑 Líder | 500+ puntos |
+
+### Visualización
+
+En el **perfil del usuario**:
+
+- Mostrar el **nivel actual** bajo el nombre (ej: "Miembro").
+- Listar todos los **badges desbloqueados** con icono y descripción.
+- Mostrar **barra de progreso** hacia el siguiente badge.
+- Indicar la **puntuación total** acumulada.
+
+En el **foro (lista de posts)**:
+
+- Mostrar el **badge principal** del autor junto a su nombre.
+- Pequeña estrella o icono si el usuario es "Líder" o superior.
+
+### Ranking comunitario (futuro)
+
+Una **pestaña "Top Voces"** en el foro mostraría:
+
+- Ranking de usuarios por puntuación del mes.
+- Podio de los 3 más activos.
+- Incentivos: no se dejan premios reales, pero el status comunitario es valorado.
+
+## Beneficios
+
+✓ **Engagement**: Los usuarios participan más si se sienten reconocidos.
+✓ **Comunidad saludable**: Favorece conversaciones de calidad (comentarios valen más).
+✓ **Confianza**: Los badges ayudan a identificar usuarios con experiencia.
+✓ **Retencion**: Los usuarios vuelven para ganar puntos y badges.
+✓ **Sentido de progreso**: Los hitos crean satisfacción inmediata.
+✓ **Visibilidad**: Los Líderes se hacen reconocibles en la comunidad.
+
+## Consideraciones de diseño
+
+- Los badges deben ser **visuales y distintivos**: usar iconos de lucide-react.
+- Los colores de los badges pueden coincidir con la **paleta de Herrikonekt**.
+- El sistema debe mostrar claramente **cómo se ganan puntos** (tooltip o ayuda).
+- Los puntos se calculan **en tiempo real** en el backend.
+- Los badges son **personales y no competitivos**: no hay "castigos" por baja participación.
+- Considerar **opciones de privacidad**: si un usuario quiere ocultar su score.
+
+## Implementación técnica
+
+### Backend
+
+- Crear colección `UserStats` con: `userId`, `puntos`, `badges`, `ultimaActualizacion`.
+- Agregar lógica para incrementar puntos cuando:
+  - Se publica un comentario.
+  - Se recibe un like en un post/respuesta.
+  - Se responde a un comentario.
+- Endpoint GET `/usuarios/{id}/stats` que devuelva puntos y badges.
+- Endpoint GET `/foro/ranking` para el ranking (opcional).
+
+### Frontend
+
+- Añadir sección en perfil para mostrar badges y puntuación.
+- Actualizar componente de autor en posts para mostrar badge.
+- Crear modal/popover con info sobre badges (cómo se ganan).
+- Animación pequeña al desbloquear un nuevo badge.
+
+### Base de datos
+
+- Agregar campos a modelo `User`: `puntuacionTotal`, `badges[]`.
+- Índices en `UserStats` para ranking rápido.
+
+## Fases de implementación
+
+**Fase 1 (MVP)**
+- Sistema básico de puntos por comentarios y likes.
+- 3 badges simples (Novato, Miembro, Líder).
+- Mostrarlo en perfil del usuario.
+
+**Fase 2**
+- 5 badges completos como arriba.
+- Visualización en foro.
+- Ranking "Top Voces" del mes.
+
+**Fase 3**
+- Leaderboard por municipio.
+- Badges temporales ("Activo esta semana").
+- Sistema de "rachas" (participación consistente).
+
+## Casos de uso
+
+**Usuario nuevo (0 puntos)**
+> Ana abre la app y ve el foro. Publica su primer comentario y recibe 2 puntos. Ve un badge de "Novato" desbloqueado.
+
+**Usuario activo (100+ puntos)**
+> José es miembro frecuente. Tiene 120 puntos y muestra el badge "🏆 Miembro". Otros usuarios ven que tiene experiencia y dan más valor a sus respuestas.
+
+**Líder comunitario (500+ puntos)**
+> María ha participado durante meses. Su badge muestra que es un "Líder", y aparece en el ranking. El ayuntamiento la contacta para colaborar.
+
+## Estado
+
+<Warning>
+  **No planificado**: Este es un sistema gamificado futuro para incentivar la participación en el foro. Su implementación depende de validación con usuarios y priorización en el roadmap de Herrikonekt.
+</Warning>
+
+<Note>
+  **Próximos pasos**: Validar el interés en las comunidades piloto, iterar en los puntos/badges, y definir cuál es el mejor incentivo sin crear desigualdad ni toxicidad comunitaria.
+</Note>
