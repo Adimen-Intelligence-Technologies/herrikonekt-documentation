@@ -1,7 +1,7 @@
 ---
 title: "Errores conocidos"
 sidebarTitle: "Errores conocidos"
-description: "Bugs reportados en la app Herrikonekt pendientes de arreglar: calendario, navegación por categorías y pestañas, foro en euskera, farmacias de guardia, el widget de empresas y las esquelas en Android."
+description: "Bugs reportados en la app Herrikonekt pendientes de arreglar: calendario, navegación por categorías y pestañas, foro en euskera, el widget de empresas y las esquelas en Android."
 icon: "bug"
 ---
 
@@ -19,11 +19,10 @@ Lista de bugs reportados sobre la app en uso, pendientes de corregir. Complement
 | 2 | Inicio → Categorías | Buscar por categoría desde Inicio lleva a "Mi ciudad" en vez de a la categoría | 🍎🤖 Ambas | 🔴 |
 | 3 | Navegación entre pestañas | Desde "Mi ciudad" a "Noticias" u otras pestañas, el contenido no carga | 🍎🤖 Ambas | 🔴 |
 | 4 | [Foro](/funcionalidades/foro) | Las categorías del foro no están traducidas al euskera | 🍎🤖 Ambas (dato de servidor) | 🟡 |
-| 5 | [Farmacias de guardia](/funcionalidades/farmacias) | La farmacia de guardia debería poder tocarse para abrir Maps | 🍎🤖 Ambas | 🟡 |
-| 6 | Widget de empresas (Mi ciudad) | No se ve el nombre completo del comercio | 🍎🤖 Ambas | 🟡 |
-| 7 | Idioma por defecto | El idioma predeterminado sale en euskera aunque el dispositivo esté en otro idioma | 🍎 **Solo iOS** — en Android funciona bien | 🟡 |
-| 8 | [Esquelas](/funcionalidades/esquelas) | Las esquelas se muestran sin foto | 🤖 **Solo Android** — en iOS sí se ve | 🟡 |
-| 9 | [Sincronización de contenido](/arquitectura/sincronizacion) | Faltan tanatorios de Elgoibar en la fuente de datos | 🍎🤖 Ambas (dato de servidor) | 🔵 |
+| 5 | Widget de empresas (Mi ciudad) | No se ve el nombre completo del comercio | 🍎🤖 Ambas | 🟡 |
+| 6 | Idioma por defecto | El idioma predeterminado sale en euskera aunque el dispositivo esté en otro idioma | 🍎 **Solo iOS** — en Android funciona bien | 🟡 |
+| 7 | [Esquelas](/funcionalidades/esquelas) | Las esquelas se muestran sin foto | 🤖 **Solo Android** — en iOS sí se ve | 🟡 |
+| 8 | [Sincronización de contenido](/arquitectura/sincronizacion) | Faltan tanatorios de Elgoibar en la fuente de datos | 🍎🤖 Ambas (dato de servidor) | 🔵 |
 
 ---
 
@@ -51,31 +50,25 @@ Esto apunta a un problema de estado o de la capa de red con caché offline espec
 
 **Sí**, esto se puede corregir desde el servidor: si las categorías se gestionan como contenido configurable en el backend (ver [El backend y su API](/arquitectura/backend)), basta con añadir el texto en euskera a cada categoría sin necesidad de tocar la app ni publicar una nueva versión. Falta confirmar dónde vive ese contenido en el servidor y si el campo de traducción euskera ya existe en el modelo o hay que añadirlo.
 
-## 5 · La farmacia de guardia no es "tocable" para abrir Maps
-
-🟡 En [Farmacias de guardia](/funcionalidades/farmacias) se pide que la tarjeta de la farmacia se pueda tocar para abrir la dirección directamente en Maps, igual que ya ocurre con "Cómo llegar" en la ficha de un comercio.
-
-Es una mejora de UX más que un bug: añadir un `onPress` a la tarjeta (o a la dirección) que abra Apple/Google Maps con la dirección de la farmacia, reutilizando el mismo patrón que ya existe en comercios.
-
-## 6 · El widget de empresas no muestra el nombre completo
+## 5 · El widget de empresas no muestra el nombre completo
 
 🟡 En el widget de comercios dentro de "Mi ciudad", el nombre de la empresa se corta y no se ve completo.
 
 Es un problema de diseño, no solo de truncado de texto: hace falta pensar un layout que dé más espacio al nombre o lo pase a dos líneas en vez de simplemente ampliar el `numberOfLines`. Revisar junto con [Sistema de diseño](/diseno/sistema-de-diseno) para mantener consistencia con el resto de tarjetas.
 
-## 7 · En iOS el idioma predeterminado también sale en euskera
+## 6 · En iOS el idioma predeterminado también sale en euskera
 
 🟡 En Apple, la app arranca en euskera por defecto en vez de respetar el idioma del dispositivo. En Android sí funciona correctamente.
 
 Según la lógica documentada en [Idioma por defecto al abrir la app](/arquitectura/idioma), la app debería usar el idioma del dispositivo si es uno soportado (es/eu/en) y caer a euskera solo como último recurso. Esto sugiere que en iOS la detección del idioma del sistema no se está leyendo bien (o llega vacía) y siempre cae al fallback. Revisar la API nativa de idioma que se usa en iOS frente a Android.
 
-## 8 · En Android las esquelas van sin foto
+## 7 · En Android las esquelas van sin foto
 
 🟡 En Android, el listado o detalle de [esquelas](/funcionalidades/esquelas) no muestra la foto, a diferencia de iOS.
 
 Probablemente una diferencia de plataforma en cómo se resuelve la URL de la imagen o en el componente de imagen usado. Comparar el comportamiento en ambas plataformas y revisar si es un problema de caché de imágenes o de la fuente de datos.
 
-## 9 · Faltan tanatorios en Elgoibar
+## 8 · Faltan tanatorios en Elgoibar
 
 🔵 Parece que hay al menos dos tanatorios más en Elgoibar que no aparecen en la app.
 
@@ -89,7 +82,6 @@ Las esquelas se alimentan mediante el patrón de adaptadores descrito en [Sincro
 - [ ] **Inicio → Categoría**: arreglar la navegación para que pase y aplique el filtro de categoría en destino.
 - [ ] **Navegación entre pestañas**: reproducir y arreglar el fallo de carga al pasar de "Mi ciudad" a otras pestañas.
 - [ ] **Foro**: añadir traducción en euskera a las categorías (editable desde servidor).
-- [ ] **Farmacias de guardia**: hacer la tarjeta/dirección tocable para abrir Maps.
 - [ ] **Widget de empresas**: rediseñar la tarjeta para mostrar el nombre completo.
 - [ ] **Idioma iOS**: revisar detección del idioma del dispositivo en Apple (arranca en euskera siempre).
 - [ ] **Esquelas Android**: investigar por qué no cargan las fotos en Android.
