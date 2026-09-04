@@ -25,6 +25,7 @@ Lista de bugs reportados sobre la app en uso, pendientes de corregir. Complement
 | 8 | Idioma por defecto | El idioma predeterminado sale en euskera aunque el dispositivo esté en otro idioma | 🍎 **Solo iOS** — en Android funciona bien | 🟡 |
 | 9 | [Esquelas](/funcionalidades/esquelas) | Las esquelas se muestran sin foto | 🤖 **Solo Android** — en iOS sí se ve | 🟡 |
 | 10 | [Esquelas](/funcionalidades/esquelas) | Revisar de dónde están saliendo los datos de esquelas de Elgibar y si faltan esquelas | 🍎🤖 Ambas (dato de servidor) | 🔵 |
+| 11 | [Foro](/funcionalidades/foro) | No se puede subir foto/imagen en un post o respuesta del foro | 🍎🤖 Ambas | 🟡 |
 
 ---
 
@@ -95,6 +96,20 @@ Las esquelas se alimentan mediante el patrón de adaptadores descrito en [Sincro
 
 ---
 
+## 11 · No se puede subir foto en el foro
+
+🟡 En el [foro](/funcionalidades/foro) (La Plaza), al crear un nuevo post o responder a una conversación, el usuario **no puede adjuntar o subir imágenes/fotos** para ilustrar su mensaje.
+
+Aunque el foro funciona sin esta funcionalidad, permitir imágenes mejoraría la calidad de la comunicación (compartir fotos de problemas, eventos, anuncios, etc.). Hay que:
+
+- Evaluar si la intención es permitir subida de imágenes en el futuro.
+- Si es así, implementar un componente de galería/cámara que permita seleccionar foto.
+- Guardar la imagen en un servicio de storage (S3 o similar) en el backend.
+- Mostrar la imagen en el post/respuesta cuando se lee.
+- Considerar límites de tamaño y formatos permitidos (JPG, PNG).
+
+---
+
 ## Lista de tareas
 
 - [ ] **Calendario**: integrar `expo-calendar` en el detalle de evento; requiere build nativo nuevo.
@@ -107,3 +122,4 @@ Las esquelas se alimentan mediante el patrón de adaptadores descrito en [Sincro
 - [ ] **Idioma iOS**: revisar detección del idioma del dispositivo en Apple (arranca en euskera siempre).
 - [ ] **Esquelas Android**: investigar por qué no cargan las fotos en Android.
 - [ ] **Esquelas Elgibar**: revisar la fuente de datos y el adaptador; comprobar si faltan esquelas.
+- [ ] **Foro - Subida de fotos**: implementar funcionalidad para subir imágenes en posts y respuestas del foro.
