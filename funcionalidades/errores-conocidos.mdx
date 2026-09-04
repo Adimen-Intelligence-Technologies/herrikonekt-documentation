@@ -1,7 +1,7 @@
 ---
 title: "Errores conocidos"
 sidebarTitle: "Errores conocidos"
-description: "Bugs reportados en la app Herrikonekt pendientes de arreglar: calendario, idioma del perfil, navegación por categorías y pestañas, foro en euskera, farmacias de guardia, el widget de empresas y las esquelas en Android."
+description: "Bugs reportados en la app Herrikonekt pendientes de arreglar: calendario, navegación por categorías y pestañas, foro en euskera, farmacias de guardia, el widget de empresas y las esquelas en Android."
 icon: "bug"
 ---
 
@@ -16,15 +16,14 @@ Lista de bugs reportados sobre la app en uso, pendientes de corregir. Complement
 | # | Área | Bug | Plataforma | Severidad |
 | --- | --- | --- | --- | --- |
 | 1 | [Agenda de eventos](/funcionalidades/agenda) | El botón de "Añadir al calendario" no funciona | 🍎 iOS + 🤖 Android (fallo distinto en cada uno) | 🔴 |
-| 2 | [Perfil](/funcionalidades/perfil) | El saludo "Hola, eres nuevo en el barrio" sale en castellano siempre | 🍎🤖 Ambas | 🟡 |
-| 3 | Inicio → Categorías | Buscar por categoría desde Inicio lleva a "Mi ciudad" en vez de a la categoría | 🍎🤖 Ambas | 🔴 |
-| 4 | Navegación entre pestañas | Desde "Mi ciudad" a "Noticias" u otras pestañas, el contenido no carga | 🍎🤖 Ambas | 🔴 |
-| 5 | [Foro](/funcionalidades/foro) | Las categorías del foro no están traducidas al euskera | 🍎🤖 Ambas (dato de servidor) | 🟡 |
-| 6 | [Farmacias de guardia](/funcionalidades/farmacias) | La farmacia de guardia debería poder tocarse para abrir Maps | 🍎🤖 Ambas | 🟡 |
-| 7 | Widget de empresas (Mi ciudad) | No se ve el nombre completo del comercio | 🍎🤖 Ambas | 🟡 |
-| 8 | Idioma por defecto | El idioma predeterminado sale en euskera aunque el dispositivo esté en otro idioma | 🍎 **Solo iOS** — en Android funciona bien | 🟡 |
-| 9 | [Esquelas](/funcionalidades/esquelas) | Las esquelas se muestran sin foto | 🤖 **Solo Android** — en iOS sí se ve | 🟡 |
-| 10 | [Sincronización de contenido](/arquitectura/sincronizacion) | Faltan tanatorios de Elgoibar en la fuente de datos | 🍎🤖 Ambas (dato de servidor) | 🔵 |
+| 2 | Inicio → Categorías | Buscar por categoría desde Inicio lleva a "Mi ciudad" en vez de a la categoría | 🍎🤖 Ambas | 🔴 |
+| 3 | Navegación entre pestañas | Desde "Mi ciudad" a "Noticias" u otras pestañas, el contenido no carga | 🍎🤖 Ambas | 🔴 |
+| 4 | [Foro](/funcionalidades/foro) | Las categorías del foro no están traducidas al euskera | 🍎🤖 Ambas (dato de servidor) | 🟡 |
+| 5 | [Farmacias de guardia](/funcionalidades/farmacias) | La farmacia de guardia debería poder tocarse para abrir Maps | 🍎🤖 Ambas | 🟡 |
+| 6 | Widget de empresas (Mi ciudad) | No se ve el nombre completo del comercio | 🍎🤖 Ambas | 🟡 |
+| 7 | Idioma por defecto | El idioma predeterminado sale en euskera aunque el dispositivo esté en otro idioma | 🍎 **Solo iOS** — en Android funciona bien | 🟡 |
+| 8 | [Esquelas](/funcionalidades/esquelas) | Las esquelas se muestran sin foto | 🤖 **Solo Android** — en iOS sí se ve | 🟡 |
+| 9 | [Sincronización de contenido](/arquitectura/sincronizacion) | Faltan tanatorios de Elgoibar en la fuente de datos | 🍎🤖 Ambas (dato de servidor) | 🔵 |
 
 ---
 
@@ -34,55 +33,49 @@ Lista de bugs reportados sobre la app en uso, pendientes de corregir. Complement
 
 Esto ya está identificado como pendiente en [Estado del proyecto](/funcionalidades/estado): en iOS no abre nada y en Android depende del navegador. La solución pasa por integrar `expo-calendar`, lo que requiere generar un **build nativo nuevo** (no se puede resolver con una actualización OTA).
 
-## 2 · El saludo de perfil sale siempre en castellano
-
-🟡 Al entrar en el perfil, el texto "Hola, eres nuevo en el barrio" aparece en castellano sin importar el idioma seleccionado en la app.
-
-Ese texto no está pasando por el sistema de traducción — probablemente está hardcodeado en español en vez de usar las claves de idioma (es/eu/en) que usa el resto de la pantalla de [Perfil](/funcionalidades/perfil). Hay que localizar la cadena y comprobar que existe traducción en euskera e inglés.
-
-## 3 · Buscar categoría desde Inicio lleva a "Mi ciudad"
+## 2 · Buscar categoría desde Inicio lleva a "Mi ciudad"
 
 🔴 Al tocar una categoría desde la pantalla de Inicio, la app no navega a esa categoría: en su lugar lleva a la pestaña "Mi ciudad" sin aplicar el filtro.
 
 Parece un problema de parámetros de navegación: la acción cambia de pestaña pero no está pasando (o no está leyendo) el parámetro de categoría al llegar a destino. Habría que revisar el `onPress` del listado de categorías en Inicio y cómo la pantalla de "Mi ciudad" lee los parámetros de la ruta al montar.
 
-## 4 · Al cambiar de pestaña desde "Mi ciudad" el contenido no carga
+## 3 · Al cambiar de pestaña desde "Mi ciudad" el contenido no carga
 
 🔴 La navegación Inicio → Mi ciudad / Eventos / Perfil funciona bien. El problema aparece al saltar **desde "Mi ciudad"** hacia Noticias u otras pestañas: la pantalla de destino no carga contenido.
 
 Esto apunta a un problema de estado o de la capa de red con caché offline específico de cómo "Mi ciudad" dispara la navegación hacia las demás pestañas (puede que no dispare el fetch inicial de la pestaña destino, o que quede un estado de carga colgado). Merece la pena reproducirlo paso a paso y mirar el hook de pantalla de cada pestaña afectada.
 
-## 5 · Categorías del foro no están en euskera
+## 4 · Categorías del foro no están en euskera
 
 🟡 Las categorías del [foro](/funcionalidades/foro) (La Plaza) no tienen traducción al euskera.
 
 **Sí**, esto se puede corregir desde el servidor: si las categorías se gestionan como contenido configurable en el backend (ver [El backend y su API](/arquitectura/backend)), basta con añadir el texto en euskera a cada categoría sin necesidad de tocar la app ni publicar una nueva versión. Falta confirmar dónde vive ese contenido en el servidor y si el campo de traducción euskera ya existe en el modelo o hay que añadirlo.
 
-## 6 · La farmacia de guardia no es "tocable" para abrir Maps
+## 5 · La farmacia de guardia no es "tocable" para abrir Maps
 
 🟡 En [Farmacias de guardia](/funcionalidades/farmacias) se pide que la tarjeta de la farmacia se pueda tocar para abrir la dirección directamente en Maps, igual que ya ocurre con "Cómo llegar" en la ficha de un comercio.
 
 Es una mejora de UX más que un bug: añadir un `onPress` a la tarjeta (o a la dirección) que abra Apple/Google Maps con la dirección de la farmacia, reutilizando el mismo patrón que ya existe en comercios.
 
-## 7 · El widget de empresas no muestra el nombre completo
+## 6 · El widget de empresas no muestra el nombre completo
 
 🟡 En el widget de comercios dentro de "Mi ciudad", el nombre de la empresa se corta y no se ve completo.
 
 Es un problema de diseño, no solo de truncado de texto: hace falta pensar un layout que dé más espacio al nombre o lo pase a dos líneas en vez de simplemente ampliar el `numberOfLines`. Revisar junto con [Sistema de diseño](/diseno/sistema-de-diseno) para mantener consistencia con el resto de tarjetas.
 
-## 8 · En iOS el idioma predeterminado también sale en euskera
+## 7 · En iOS el idioma predeterminado también sale en euskera
 
 🟡 En Apple, la app arranca en euskera por defecto en vez de respetar el idioma del dispositivo. En Android sí funciona correctamente.
 
 Según la lógica documentada en [Idioma por defecto al abrir la app](/arquitectura/idioma), la app debería usar el idioma del dispositivo si es uno soportado (es/eu/en) y caer a euskera solo como último recurso. Esto sugiere que en iOS la detección del idioma del sistema no se está leyendo bien (o llega vacía) y siempre cae al fallback. Revisar la API nativa de idioma que se usa en iOS frente a Android.
 
-## 9 · En Android las esquelas van sin foto
+## 8 · En Android las esquelas van sin foto
 
 🟡 En Android, el listado o detalle de [esquelas](/funcionalidades/esquelas) no muestra la foto, a diferencia de iOS.
 
 Probablemente una diferencia de plataforma en cómo se resuelve la URL de la imagen o en el componente de imagen usado. Comparar el comportamiento en ambas plataformas y revisar si es un problema de caché de imágenes o de la fuente de datos.
 
-## 10 · Faltan tanatorios en Elgoibar
+## 9 · Faltan tanatorios en Elgoibar
 
 🔵 Parece que hay al menos dos tanatorios más en Elgoibar que no aparecen en la app.
 
@@ -93,7 +86,6 @@ Las esquelas se alimentan mediante el patrón de adaptadores descrito en [Sincro
 ## Lista de tareas
 
 - [ ] **Calendario**: integrar `expo-calendar` en el detalle de evento; requiere build nativo nuevo.
-- [ ] **Perfil**: localizar el saludo "Hola, eres nuevo en el barrio" (es/eu/en).
 - [ ] **Inicio → Categoría**: arreglar la navegación para que pase y aplique el filtro de categoría en destino.
 - [ ] **Navegación entre pestañas**: reproducir y arreglar el fallo de carga al pasar de "Mi ciudad" a otras pestañas.
 - [ ] **Foro**: añadir traducción en euskera a las categorías (editable desde servidor).
