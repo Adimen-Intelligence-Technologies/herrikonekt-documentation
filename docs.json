@@ -76,6 +76,8 @@
           {
             "group": "Funcionalidades futuras",
             "pages": [
+              "futuro/distincion-ayuntamiento-foro",
+              "futuro/gamificacion-badges",
               "futuro/gasolineras",
               "futuro/playas",
               "futuro/transporte-publico",
