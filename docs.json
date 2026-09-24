@@ -63,14 +63,16 @@
               "arquitectura/app",
               "arquitectura/backend",
               "arquitectura/idioma",
-              "arquitectura/sincronizacion"
+              "arquitectura/sincronizacion",
+              "arquitectura/convenciones"
             ]
           },
           {
             "group": "Proyecto",
             "pages": [
               "funcionalidades/estado",
-              "funcionalidades/errores-conocidos"
+              "funcionalidades/errores-conocidos",
+              "calidad/openspec"
             ]
           },
           {

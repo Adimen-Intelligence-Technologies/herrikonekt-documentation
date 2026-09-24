@@ -5,95 +5,120 @@ description: "Resumen transversal de qué funcionalidades de Herrikonekt están 
 icon: "list-check"
 ---
 
-Resumen del estado de la app a partir del código y de los cambios de OpenSpec del repositorio. El detalle de cada punto está en su página de *Funcionalidades*.
+Resumen del estado actual de la plataforma completa Herrikonekt (app móvil, backend, dashboard y base de datos).
 
-<Note>
-  Convención: **Listo** = funciona en la app · **En curso** = parcialmente hecho o pendiente de verificación · **Pendiente** = definido pero no operativo.
-</Note>
+## Repositorios y estado general
 
-## Cómo vamos
+| Repositorio | Stack | Estado | Notas |
+| --- | --- | --- | --- |
+| **Herrikonekt** | Expo SDK 57, React Native 0.86, React 19.2, expo-router 6, Zustand + Immer | **Producción** | ~80 rutas, ~120 hooks, aplicación principal del producto. |
+| **herrikonekt-server** | Next.js 16, MongoDB 7.4, better-auth 1.6, Stripe, MCP | **Producción** | ~90 rutas API, panel interno, servidor MCP, crons de sincronización. |
+| **herrikonekt-client-dashboard** | Next.js 16.3, React 19.2, Tailwind 4 | **Scaffolding** | Fase inicial; permite a titulares gestionar comercios (futuro). |
+| **MongoDB Atlas** | Cluster `adimencrm` | **Producción** | 28 colecciones, backups automatizados. |
 
-<Note>
-  **Fase 1** = la app que existe hoy (todo lo de *Funcionalidades*), terminada y verificada en dispositivo.
-  **Fase 2** = las [funcionalidades futuras](/futuro/gasolineras) y lo aplazado (foro "Siguiendo", alertas de noticias, monetización).
-</Note>
+## Funcionalidades por categoría
 
-```mermaid
-pie showData
-    title Funcionalidades de Fase 1
-    "Terminado" : 18
-    "En curso (falta verificar)" : 4
-    "Falta" : 3
-```
+### ✅ Completadas (18)
 
-El alcance funcional de Fase 1 está **~85 % hecho**: 18 funcionalidades terminadas, 4 a falta solo de verificación en dispositivo, y 3 aún por implementar (tréboles, "Añadir a calendario", Google Sign-In en iOS). El camino a la salida es sobre todo **verificación** y **un build nativo**.
-
-### Camino a la salida de Fase 1
-
-```mermaid
-flowchart LR
-    P1["1 · Verificar en\ndispositivo los changes\ncasi listos"] --> P2["2 · Build EAS con\nexpo-calendar +\niosClientId de Google"]
-    P2 --> P3["3 · Implementar y QA:\nAñadir a calendario +\nGoogle Sign-In iOS"]
-    P1 --> P5["5 · Conectar tréboles\nal servidor (opt-in\n+ un trébol/día)"]
-    P4["4 · Servidor de mapas:\ncoordenadas + estilo\nde marca"] -.-> SALIDA(["Salida de Fase 1"])
-    P3 --> SALIDA
-    P5 --> SALIDA
-```
-
-| Paso | Qué es | Estado |
+| Funcionalidad | Descripción | Plataforma |
 | --- | --- | --- |
-| 1 | Verificar en dispositivo: reclamar comercio (envío multipart), rendimiento de listados, tipografía | 🟡 En curso |
-| 2 | Un build EAS que incluya `expo-calendar` + `iosClientId` de Google | 🔴 Pendiente |
-| 3 | Implementar y QA de "Añadir a calendario" y "Google Sign-In iOS" con ese build | 🔴 Pendiente |
-| 4 | Follow-ups de servidor de mapas: coordenadas de comercios + estilo de mapa de marca | 🟡 En curso |
-| 5 | Conectar tréboles al servidor: opt-in en el perfil + modelo "un trébol al día" | 🔴 Pendiente |
+| Directorio de comercios | Buscador, tipos, listado paginado y cacheado | App + Backend |
+| Ficha de comercio | Horario, contacto, fotos, descripción multiidioma, servicios, distintivo premium | App + Backend |
+| Mapa del comercio | Botón "Cómo llegar" (Apple/Google Maps) | App + Backend |
+| Anuncios y ofertas | Carrusel en Inicio, filtrado por municipio | App + Backend |
+| Comercio destacado (premium) | Distintivo visual dorado, sin pago en app | App + Backend |
+| Favoritos (trébol) | Marcar/desmarcar ilimitado, sincronización por servidor | App + Backend |
+| Reclamar comercio | Formulario con documento acreditativo, seguimiento en "Mis comercios" | App + Backend |
+| Agenda de eventos | Mini-calendario, lista de próximos, detalle con HTML | App + Backend |
+| Noticias municipales | Listado, artículo completo por idioma, deduplicación | App + Backend |
+| Farmacias de guardia | Guardia del día, modo día/noche, llamada directa | App + Backend |
+| Esquelas | Listado y detalle por municipio, compartir, enlace al origen | App + Backend |
+| Taxis del municipio | Listado, "Pedir taxi", ruta a parada | App + Backend |
+| Foro vecinal | Publicar, responder, reportar, filtro por tema, moderación | App + Backend |
+| Notificaciones del foro | Push de respuestas, marcar leídas, badge en Perfil | App + Backend |
+| Perfil y cuenta | Registro/login (email, Apple, Google en Android), edición, opt-out analítica | App + Backend |
+| Cerrar sesión | Fila propia en Perfil con confirmación | App + Backend |
+| Rendimiento de listados | Virtualización, memoización, caché de thumbnails, splash nativo | App |
+| Módulos nativos preinstalados | `expo-camera`, `expo-document-picker`, `expo-sharing` listos para uso futuro | App |
 
-Fuera de Fase 1 (van a Fase 2): alta de comercio por API, foro "Siguiendo", filtros/alertas de noticias, monetización. El seguimiento operativo de todo esto está en el change `roadmap-pendientes` de OpenSpec.
+### 🟡 En curso (4)
 
-## Terminado
+| Funcionalidad | Qué falta | Estimado |
+| --- | --- | --- |
+| Multipart en iOS | Reconfirmar envío de documento en dispositivo iOS | Corto |
+| Estilo de mapa | Alojar estilo de marca; confirmar servidor rellena coordenadas | Corto |
+| Build EAS nativo | Validación en dispositivo (necesario para `expo-calendar`) | Medio |
+| Rendimiento general | Recorrido de verificación en dispositivo | Medio |
 
-| Funcionalidad | Notas |
-| --- | --- |
-| [Directorio de comercios](/funcionalidades/comercios) | Buscador, tipos de comercio, listado paginado y cacheado. |
-| [Ficha de comercio](/funcionalidades/comercios) | Horario, contacto (llamar/email/web/redes), fotos, descripción multiidioma, servicios, distintivo premium. |
-| [Mapa del comercio](/funcionalidades/comercios) | Thumbnail en la ficha + botón "Cómo llegar" (Apple/Google Maps). Depende de que el servidor cargue coordenadas. |
-| [Anuncios / ofertas](/funcionalidades/comercios) | Carrusel en Inicio, filtrado por municipio. |
-| [Comercio destacado (premium)](/funcionalidades/comercios-destacados) | Distintivo visual dorado (`esDestacado`). Sin pago en la app. |
-| [Favoritos (trébol)](/funcionalidades/favoritos) | Marcar/desmarcar ilimitado, gate de login con repetición, sincronización por servidor. |
-| [Reclamar un comercio](/funcionalidades/tu-comercio) | Formulario con motivo + documento acreditativo, seguimiento en "Mis comercios". |
-| [Agenda de eventos](/funcionalidades/agenda) | Mini-calendario, filtro por día, próximos eventos, detalle con contenido HTML. |
-| [Noticias](/funcionalidades/noticias) | Listado, artículo completo por idioma, deduplicación multiidioma, banda de idioma de reserva. |
-| [Farmacias de guardia](/funcionalidades/farmacias) | Guardia del día, modo día/noche, llamada directa. |
-| [Esquelas](/funcionalidades/esquelas) | Listado y detalle por municipio, compartir, enlace al origen. |
-| [Taxis](/funcionalidades/taxis) | Listado, "Pedir taxi", ruta a la parada. |
-| [Foro](/funcionalidades/foro) | "La Plaza", publicar, responder, reportar, filtro por tema, moderación visible. |
-| [Notificaciones del foro](/funcionalidades/notificaciones) | Push de respuestas, marcar leídas, badge en Perfil. |
-| [Perfil y cuenta](/funcionalidades/perfil) | Registro/login (email, Apple, Google en Android), edición de perfil, opt-out de analítica. |
-| Cerrar sesión visible | Fila propia en Perfil con confirmación (antes solo en "Editar perfil"). |
-| Rendimiento de listados | Listado de comercios virtualizado, cards memoizadas, caché de thumbnails de mapa, splash nativo. |
-| Módulos nativos preinstalados | `expo-camera`, `expo-document-picker`, `expo-sharing` listos para un uso futuro. |
+### 🔴 Pendientes (3)
 
-## En curso
+| Funcionalidad | Situación | Repositorio |
+| --- | --- | --- |
+| Tréboles (impulso/ranking) | Servidor tiene contrato; app falta modelo "un trébol al día", opt-in, estados, verificación | Móvil + Backend |
+| Añadir a calendario | Requiere `expo-calendar` + build nativo. Hoy falla en iOS, Android depende del navegador | Móvil |
+| Google Sign-In en iPhone | Falla con `failed to determine clientID`; falta client ID iOS + build nativo | Móvil |
+| Alta de comercio nuevo | Se envía por email, sin formulario conectado a API | Móvil + Backend |
+| Foro — pestaña "Siguiendo" | Muestra "muy pronto"; no se puede seguir a personas ni temas | Móvil + Backend |
+| Noticias — filtros y alertas | UI sin implementar: filtro por categoría, favoritos de noticias, alertas push | Móvil + Backend |
+| Monetización | Modelo de negocio sin definir. RevenueCat instalado sin usar | Estrategia |
 
-| Funcionalidad | Qué falta |
-| --- | --- |
-| [Reclamar un comercio](/funcionalidades/tu-comercio) | Reconfirmar el envío del documento (multipart) en dispositivo iOS y Android. |
-| [Mapa del comercio](/funcionalidades/comercios) | Alojar el estilo de mapa de marca (hoy usa un estilo público de reserva); confirmar que el servidor rellena coordenadas para los comercios existentes. |
-| Rendimiento / limpieza | Recorrido manual de verificación en dispositivo pendiente. |
-| Módulos nativos preinstalados | Falta el build EAS de validación. |
+## Funcionalidades futuras
 
-## Pendiente
+Documentadas en la sección **Funcionalidades futuras** pero aún no planificadas:
 
-| Funcionalidad | Situación |
-| --- | --- |
-| [Tréboles (impulso / ranking)](/funcionalidades/treboles) | El servidor tiene el contrato; en la app falta el modelo "un trébol al día", el opt-in en el perfil, los estados del botón y la verificación. Hoy el botón guarda favoritos. |
-| [Añadir evento al calendario](/funcionalidades/agenda) | No funciona en iOS (no abre nada) y en Android depende del navegador. Pendiente reescribir con `expo-calendar` + build nativo nuevo. |
-| [Google Sign-In en iPhone](/funcionalidades/perfil) | Falla con `failed to determine clientID`; falta configurar el client ID de iOS + build nativo nuevo. En Android funciona. |
-| [Alta de comercio nuevo](/funcionalidades/tu-comercio) | Todavía se envía por correo, sin formulario conectado a la API. |
-| [Foro — pestaña "Siguiendo"](/funcionalidades/foro) | Muestra "muy pronto"; no se puede seguir a personas ni temas. |
-| [Noticias — filtros y alertas](/funcionalidades/noticias) | Textos traducidos, sin UI: filtro por categoría, favoritos de noticias, alertas push por categoría. |
-| [Monetización](/funcionalidades/comercios-destacados) | Sin definir. RevenueCat instalado sin usar; el pago del destacado vive fuera de la app; sin planes de usuario. |
+- **Gasolineras** — Mostrar precio de gasolineras cercanas con filtro por carburante.
+- **Playas y mareas** — Bandera de baño, tabla de mareas, condiciones del mar.
+- **Transporte público** — Próximos pasos de autobús/tren, líneas disponibles (datos GTFS).
+- **Loterías** — Resultados de Euromillones, Primitiva, Bonoloto, El Gordo, etc.
+- **Turismo y rutas** — Catálogo comunitario de rutas y sitios de interés (miradores, cascadas, cimas).
 
-## Requiere un build nativo nuevo
+## Infraestructura y operaciones
 
-Algunos pendientes cambian código nativo y **no** se pueden entregar como actualización OTA: "Añadir a calendario" (`expo-calendar`) y "Google Sign-In en iOS". Los development builds anteriores quedarán desactualizados cuando se genere el siguiente.
+### Bases de datos
+
+- **MongoDB Atlas** — 28 colecciones, cluster `adimencrm`, producción con copias de seguridad locales en `backups/`.
+- **~50 índices** declarados: únicos parciales, TTL (30 días para historial), 2dsphere para proximidad, multikey para arrays.
+- **Auditoría**: cada cambio queda registrado en `historialCambios` (append-only, TTL 30 días).
+
+### Documentación de API
+
+- **OpenAPI 3.1** — Servido en `/api/openapi.json` y renderizado en `/api/docs` (Scalar).
+- **Schemas Zod v4** — Única fuente de verdad de la forma de documentos.
+- **Validación:** toda entrada y salida validada con Zod antes de persistir.
+
+### Autenticación y autorización
+
+- **better-auth 1.6** — Email + password, Apple, Google.
+- **Roles** — `admin` (plataforma), membresía de comercio (`owner`, `admin`).
+- **Sesión** — Cookie HTTP-only, optional (app funciona sin login).
+- **MCP API keys** — Autenticación programática para administradores.
+
+### Pipeline de calidad
+
+- **TypeScript estricto** (`tsc --noEmit`).
+- **ESLint flat config** (`--max-warnings 0` en CI).
+- **GitHub Actions** — Lint + typecheck en cada push a `main` y PR.
+- **OpenSpec** — Gestión de cambios con sincronización a GitHub Issues (móvil).
+
+### Despliegue y actualización
+
+- **App móvil** — EAS Build (development, preview, production) + EAS Update (OTA con `appVersion`).
+- **Backend y panel** — Vercel (build automático en cada push a `main`). Crons nativos para sincronización de feeds.
+- **Dashboard** — Vercel (futuro).
+
+## Resumen de trabajo pendiente
+
+1. **Verificación en dispositivo** — Pruebas E2E manuales de reclamación multipart, rendimiento de listados.
+2. **Build EAS nativo** — Necesario para `expo-calendar` y Google Sign-In en iOS.
+3. **Integración de Tréboles** — Servidor listo; falta conectar en la app (opt-in + límite diario).
+4. **Monetización** — Decisión de modelo de negocio y flujos de pago in-app.
+5. **Panel de comercios** — Scaffolding hecho; falta implementar edición, ofertas, anuncios de pago.
+6. **Funcionalidades futuras** — Evaluación de viabilidad y priorización (gasolineras, playas, transporte, etc.).
+
+## Recursos y documentación
+
+- **Memoria técnica completa** → [intro-tecnica.md](/docs/intro-tecnica.md)
+- **Decisiones de arquitectura** → [Arquitectura de la app](/arquitectura/app), [El backend](/arquitectura/backend), [Sincronización](/arquitectura/sincronizacion)
+- **Gestión de cambios** → [OpenSpec](/calidad/openspec)
+- **Design tokens** → [Sistema de diseño](/diseno/sistema-de-diseno)
+- **Errores conocidos** → [Ver sección dedicada](/funcionalidades/errores-conocidos)

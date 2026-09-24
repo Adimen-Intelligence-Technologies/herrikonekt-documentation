@@ -90,7 +90,7 @@ Para GETs, con una `key` estable (ej. `businesses:list:v4:{page}`):
 La caché (`lib/cache.ts`) es **SQLite** (`herrikonekt-cache.db`, tabla `cache(key, data, expiresAt)`):
 
 - TTL por defecto **30 días** (generoso: la app debe funcionar offline).
-- Overrides por prefijo: `pharmacy:` 12 h, `news:` / `eventos:` 24 h, `notifications:` 60 s.
+- Overrides por prefijo: `TTL_BY_PREFIX` en `lib/cache.ts` (hoy vacío; extensible para datos de corta vida, ej. `pharmacy: 12h`, `notifications: 60s`).
 - No-op en web. Cualquier error de caché se degrada a "miss" — nunca rompe el flujo de red.
 - `clearCache()` se llama al cerrar sesión.
 
