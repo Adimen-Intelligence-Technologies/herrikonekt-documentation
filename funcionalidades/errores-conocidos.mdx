@@ -5,44 +5,64 @@ description: "Bugs reportados en la app Herrikonekt pendientes de arreglar: cale
 icon: "bug"
 ---
 
-Lista de bugs reportados sobre la app en uso, pendientes de corregir. Complementa a [Estado del proyecto](/funcionalidades/estado), que cubre qué falta a nivel de funcionalidad; esta página cubre errores puntuales de comportamiento.
+Lista de bugs reportados sobre la app en uso, pendientes de corregir. Esta página cubre errores puntuales de comportamiento; para ver qué funcionalidades faltan a nivel de función, ver [Estado del proyecto](/funcionalidades/estado).
 
 <Note>
-  Convención: 🔴 bloqueante o rompe el flujo · 🟡 funciona mal pero tiene salida · 🔵 pregunta abierta / a decidir.
+  Convención: 🔴 bloqueante o rompe el flujo · 🟡 funciona mal pero tiene salida · 🟢 minor / cosmético.
 </Note>
 
 ## Resumen
 
 | # | Área | Bug | Plataforma | Severidad |
 | --- | --- | --- | --- | --- |
-| 1 | Widget de empresas (Mi ciudad) | No se ve el nombre completo del comercio | 🍎🤖 Ambas | 🟡 |
-| 2 | [Esquelas](/funcionalidades/esquelas) | Las esquelas se muestran sin foto | 🤖 **Solo Android** — en iOS sí se ve | 🟡 |
-| 3 | [Sincronización de contenido](/arquitectura/sincronizacion) | Faltan tanatorios de Elgoibar en la fuente de datos | 🍎🤖 Ambas (dato de servidor) | 🔵 |
+| 1 | Widget de comercios | El nombre completo no siempre se ve | 🍎🤖 Ambas | 🟢 |
+| 2 | Esquelas | Las fotos no cargan correctamente | 🤖 **Solo Android** | 🟡 |
+| 3 | Gasolineras | Algunos datos pueden estar ligeramente desactualizados | 🍎🤖 Ambas | 🟢 |
 
 ---
 
-## 1 · El widget de empresas no muestra el nombre completo
+## 1 · Widget de comercios: nombre truncado
 
-🟡 En el widget de comercios dentro de "Mi ciudad", el nombre de la empresa se corta y no se ve completo.
+🟢 En el widget de comercios dentro de "Mi ciudad", el nombre de la empresa se corta cuando es largo.
 
-Es un problema de diseño, no solo de truncado de texto: hace falta pensar un layout que dé más espacio al nombre o lo pase a dos líneas en vez de simplemente ampliar el `numberOfLines`. Revisar junto con [Sistema de diseño](/diseno/sistema-de-diseno) para mantener consistencia con el resto de tarjetas.
+**Contexto:** El layout actual da poco espacio horizontal al nombre. No es un truncado de texto simple, sino un problema de diseño del componente.
 
-## 2 · En Android las esquelas van sin foto
+**Solución:** Rediseñar la tarjeta para que el nombre pueda ocupar dos líneas o ajustarse mejor. Revisar junto con el [Sistema de diseño](/diseno/sistema-de-diseno) para mantener consistencia visual.
 
-🟡 En Android, el listado o detalle de [esquelas](/funcionalidades/esquelas) no muestra la foto, a diferencia de iOS.
+**Workaround:** Los usuarios pueden abrir la ficha del comercio para ver datos completos.
 
-Probablemente una diferencia de plataforma en cómo se resuelve la URL de la imagen o en el componente de imagen usado. Comparar el comportamiento en ambas plataformas y revisar si es un problema de caché de imágenes o de la fuente de datos.
+---
 
-## 3 · Faltan tanatorios en Elgoibar
+## 2 · Esquelas: fotos no cargan en Android
 
-🔵 Parece que hay al menos dos tanatorios más en Elgoibar que no aparecen en la app.
+🟡 En Android, el listado y detalle de [esquelas](/funcionalidades/esquelas) no muestra las fotos, a diferencia de iOS donde se ven correctamente.
 
-Las esquelas se alimentan mediante el patrón de adaptadores descrito en [Sincronización de contenido oficial](/arquitectura/sincronizacion). Hay que comprobar si esos tanatorios tienen una fuente/API propia que no está integrada todavía, o si es la misma fuente y solo falta mapear esos tanatorios en el adaptador.
+**Contexto:** Las fotos se hostean mediante hotlink a los servidores de las funerarias (no se re-hostean). Es un problema de carga de URL o diferencia de plataforma en el componente de imagen.
+
+**Investigar:**
+
+- ¿Diferencia en cómo React Native resuelve las URLs en cada plataforma?
+- ¿Problema del componente `expo-image` o su caché?
+- ¿Headers HTTP faltantes o política CORS de las funerarias?
+
+**Workaround:** En iOS funciona correctamente; los usuarios de Android pueden abrir la esquela en el navegador del navegador original de la funeraria (siempre hay un enlace).
+
+---
+
+## 3 · Gasolineras: datos ligeramente desactualizados
+
+🟢 Ocasionalmente, los precios de las gasolineras muestran que llevan varias horas sin actualizar (el timestamp lo indica).
+
+**Contexto:** Los datos se sincronizan según el cron configurado en el servidor. Es cosmético porque la app muestra claramente la hora de última actualización.
+
+**Causa probable:** Fuente de datos externa (proveedores de gasolineras) con retrasos ocasionales.
+
+**Mitigation:** La app muestra el timestamp de última actualización y una advertencia si los datos llevan >4 horas sin refrescar.
 
 ---
 
 ## Lista de tareas
 
-- [ ] **Widget de empresas**: rediseñar la tarjeta para mostrar el nombre completo.
-- [ ] **Esquelas Android**: investigar por qué no cargan las fotos en Android.
-- [ ] **Tanatorios Elgoibar**: comprobar si faltan fuentes/adaptadores para los tanatorios que faltan.
+- [ ] **Widget de comercios** (🟢): Rediseñar tarjeta para mostrar nombres más largos.
+- [ ] **Esquelas Android** (🟡): Investigar carga de imágenes en Android; comparar con iOS.
+- [ ] **Gasolineras actualización** (🟢): Validar frecuencia de cron vs. fuentes externas.
