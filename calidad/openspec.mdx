@@ -1,0 +1,56 @@
+---
+title: "OpenSpec: gestión de cambios"
+sidebarTitle: "OpenSpec"
+description: "Cómo se documentan, diseñan e implementan los cambios en Herrikonekt mediante OpenSpec y su sincronización con GitHub Issues."
+---
+
+**OpenSpec** es un flujo experimental de gestión de cambios que documenta cada modificación importante del proyecto. El flujo está completamente integrado con GitHub Issues en el repositorio móvil.
+
+## Estructura de un change
+
+Cada change vive en `openspec/changes/<name>/`:
+
+- **`proposal.md`** — Qué se va a hacer y por qué.
+- **`design.md`** — Decisiones técnicas y opciones evaluadas.
+- **`tasks.md`** — Checklist de implementación (se sincroniza con GitHub Issues).
+- **`specs/`** — Cambios en la especificación por dominio.
+- **`.openspec.yaml`** — Metadatos (número de GitHub issue, fecha de archivo).
+
+## Flujo principal
+
+```bash
+npm run opsx:new <name>      # Crear change + abrir GitHub Issue
+npm run opsx:issue <name>    # Sincronizar task list (editar tasks.md primero)
+npm run opsx:apply <name> --archive  # Archivar change
+```
+
+## Comandos disponibles
+
+| Comando | Para qué |
+| --- | --- |
+| `npm run opsx:new <name>` | Crear change y abrir GitHub Issue automáticamente. |
+| `npm run opsx:issue <name>` | Sincronizar task list: `- [ ]` en tasks.md → GitHub Issue. |
+| `npm run opsx:issue <name> --recreate` | Cerrar issue anterior y crear uno nuevo. |
+| `npm run opsx:apply <name>` | Implementar/trabajar en el change. |
+| `npm run opsx:apply <name> --archive` | Archivar: mover a `archive/`, sincronizar specs. |
+
+Todos aceptan `--dry-run` para previsualizar.
+
+## Sincronización con GitHub (solo móvil)
+
+En el repositorio `Herrikonekt`, cada change se sincroniza con un GitHub Issue:
+
+1. **Crear** → `npm run opsx:new migrar-bbdd` abre `#NNN`.
+2. **Trabajar** → edita `tasks.md`, marca `- [x]` lo terminado.
+3. **Sincronizar** → `npm run opsx:issue migrar-bbdd` refleja el checklist en `#NNN`.
+4. **Archivar** → `npm run opsx:apply migrar-bbdd --archive` (cierra issue manualmente).
+
+## En `herrikonekt-server` y `herrikonekt-client-dashboard`
+
+Sin sincronización automática; flujo manual con `openspec` CLI.
+
+## Requisito: `gh` autenticado
+
+```bash
+gh auth login
+```
