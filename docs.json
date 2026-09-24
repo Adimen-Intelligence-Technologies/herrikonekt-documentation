@@ -1,8 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "almond",
+  "theme": "mint",
   "name": "Herrikonekt",
-  "description": "Documentación de la app Herrikonekt: qué es, cómo se usa y en qué estado está cada funcionalidad.",
+  "description": "Documentación técnica de la App de Herrikonekt.",
   "colors": {
     "primary": "#133212",
     "light": "#A0F981",
@@ -86,5 +86,17 @@
         ]
       }
     ]
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "background": {
+    "color": {
+      "light": "#E9E9E9",
+      "dark": "#133212"
+    }
+  },
+  "appearance": {
+    "default": "system"
   }
 }
