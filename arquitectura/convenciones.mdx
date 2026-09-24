@@ -1,0 +1,323 @@
+---
+title: "Convenciones de código"
+sidebarTitle: "Convenciones"
+description: "Reglas de estructura, nombrado y patrones compartidas por los tres repositorios de Herrikonekt."
+---
+
+Estas convenciones aplican a los tres repositorios (app móvil, backend, dashboard) y aseguran consistencia, legibilidad y mantenibilidad a largo plazo.
+
+## Componentes y modularidad
+
+### Tamaño de componentes
+
+- Un componente **no debe superar ~200 líneas** de código.
+- Si crece, dividé en piezas reutilizables.
+- Los componentes muy simples (botones, etiquetas) viven en `components/ui/`; los de dominio en `components/<dominio>/`.
+
+### El patrón "hook de pantalla" (app móvil)
+
+Toda pantalla con estado o derivaciones no triviales delega su lógica en un hook dedicado:
+
+```
+app/pharmacy.tsx                ← solo JSX + estilos
+hooks/use-pharmacy-screen.ts    ← estado, handlers, derives, side-effects
+```
+
+El hook devuelve:
+
+```typescript
+return {
+  guardias,        // estado
+  selectedTime,
+  setSelectedTime, // handlers
+  onCall,
+  isLoading,       // flags
+  error,
+  t,              // i18n
+};
+```
+
+La pantalla solo consume y renderiza.
+
+**Por qué:** separación clara entre lógica (testeable) y presentación (visual). Permite reusar lógica entre pantallas.
+
+## Redes HTTP
+
+### Regla de oro: nunca `fetch` directo
+
+**Móvil:** `lib/client` (fetch tipado) o `lib/subscriber` (con caché).
+**Backend:** `runMiddleware` (middleware único de transporte).
+**Dashboard:** similar a móvil, `lib/client`.
+
+```typescript
+// ❌ Prohibido
+const res = await fetch(`${API}/comercios`);
+
+// ✅ App móvil
+const res = await client('/comercios', { secure: true });
+const { data } = await subscriber.createSubscriber(
+  '/comercios',
+  options,
+  'comercios:list:v4'
+);
+
+// ✅ Backend
+export const GET = runMiddleware(
+  { schema: QuerySchema, outSchema: ComercioList },
+  async ({ data, getModels }) => {
+    const models = await getModels();
+    return { json: await listComercios(models, data) };
+  }
+);
+```
+
+## Lógica de negocio
+
+### Nunca en JSX, siempre en hooks (móvil)
+
+La lógica **no trivial** vive en hooks; la pantalla queda limpia:
+
+```typescript
+// ❌ Lógica en JSX
+<Pressable onPress={() => {
+  const filtered = items.filter(x => x.visible && !x.deleted);
+  setItems(filtered.sort((a, b) => b.createdAt - a.createdAt));
+}}>
+
+// ✅ Lógica en el hook
+hooks/use-my-items-screen.ts:
+const filteredItems = useMemo(() => {
+  return items.filter(x => x.visible && !x.deleted)
+    .sort((a, b) => b.createdAt - a.createdAt);
+}, [items]);
+
+app/my-items.tsx:
+<Pressable onPress={onSortLatest} />
+```
+
+### Backend: modelo layer, nunca en handlers
+
+```typescript
+// ❌ Lógica en el handler
+export const POST = runMiddleware(
+  ...,
+  async ({ data, getModels }) => {
+    const models = await getModels();
+    const comercio = await models.comercios.findOne({ _id: data.comercioId });
+    if (!comercio) throw new NotFoundError();
+    const updated = { ...comercio, ...data };
+    await models.comercios.updateOne({ _id: comercio._id }, updated);
+  }
+);
+
+// ✅ Lógica en el modelo
+lib/models/comercios.ts:
+export async function updateComercio(
+  models: AppModels,
+  id: ObjectId,
+  data: ComercioUpdateInput,
+  contexto: ContextoCambio
+) {
+  // validación, auditoría, transformaciones
+}
+
+app/api/comercios/[id]/route.ts:
+export const PATCH = runMiddleware(
+  ...,
+  async ({ data, getModels, contexto }) => {
+    const models = await getModels();
+    return { json: await updateComercio(models, data.id, data, contexto!) };
+  }
+);
+```
+
+## Estado global
+
+### Móvil: Zustand + Immer
+
+```typescript
+// ✅ State global
+store/index.ts:
+const useStore = create<AppStore>((set) =>
+  immer({
+    businesses: {
+      items: [],
+      status: 'idle',
+      ...
+    },
+    ...
+  })
+);
+
+// ✅ En un hook de API
+lib/api/businesses.ts:
+export function useListBusinesses() {
+  const setBusinesses = useStore((s) => s.setBusinesses);
+  // fetch + actualizar store
+}
+```
+
+**Regla:** estado **nuevo** va a Zustand + Immer. Los contextos existentes se respetan; no anidar stores sobre contextos vivos.
+
+## Estilos y diseño
+
+### Texto: siempre `AppText` (móvil)
+
+```typescript
+// ❌ Prohibido
+<Text style={{ fontSize: 16, fontWeight: 'bold' }}>Hola</Text>
+
+// ✅ Obligatorio
+<AppText variant="headline">Hola</AppText>
+```
+
+Variantes: `title1`, `title2`, `title3`, `headline`, `body`, `callout`, `subhead`, `footnote`, `caption1`. Ver [Sistema de diseño](/diseno/sistema-de-diseno).
+
+### Color: siempre desde tokens
+
+```typescript
+// ❌ Prohibido
+const colors = { brand: '#133212', light: '#A0F981' };
+styleSheet.create({ heading: { color: '#133212' } });
+
+// ✅ Obligatorio
+import { AppColors } from '@/constants/colors';
+styleSheet.create({
+  heading: { color: AppColors.headingColor },
+  accent: { color: AppColors.categoryBorder },
+});
+```
+
+Tokens base: `background`, `headingColor`, `categoryBorder`, `white`, `primary`, `secondary`, `text`, `textSecondary`... Ver `constants/colors.ts`.
+
+### Opacidades
+
+```typescript
+// ❌ Prohibido
+{ backgroundColor: 'rgba(19, 50, 18, 0.1)' }
+
+// ✅ Obligatorio
+import { withOpacity } from '@/constants/colors';
+{ backgroundColor: withOpacity(AppColors.headingColor, 0.1) }
+```
+
+### Padding lateral: origen único
+
+```typescript
+// ❌ Prohibido
+paddingHorizontal: 16
+
+// ✅ Obligatorio
+import { ScreenLayout } from '@/constants/layout';
+paddingHorizontal: ScreenLayout.screenPadding  // = 16, origen único
+```
+
+Si cambias 16 a otro valor, lo cambias en un solo lugar: `constants/layout.ts`.
+
+## Tipos y TypeScript
+
+### TypeScript estricto, sin `as any`
+
+Enforzado en CI con `tsc --noEmit`.
+
+```typescript
+// ❌ Prohibido
+const data = response.json() as any;
+
+// ✅ Obligatorio
+const data = response.json() as ComercioEntity;
+// o mejor: validación con Zod
+const data = ComercioSchema.parse(response.json());
+```
+
+### Nombrado
+
+- **Tipos, interfaces:** `PascalCase` (`User`, `ComercioEntity`)
+- **Variables, funciones:** `camelCase` (`user`, `createComercio`)
+- **Constantes:** `UPPER_SNAKE_CASE` solo si son valores mágicos (`MAX_RETRIES = 3`); para tokens usar `camelCase` (`AppColors.headingColor`)
+- **Nombres largos son OK** si son claros: `usePharmacyGuardiaToday` > `usePharm`
+
+## Documentación
+
+### JSDoc mínimo (una línea)
+
+Todo componente, hook y función exportada debe tener JSDoc de **una línea**:
+
+```typescript
+/** Renderiza el listado de comercios filtrado por ciudad. */
+export function BusinessList({ cityId }: Props) { ... }
+
+/** Gestiona estado y handlers de la pantalla de farmacias. */
+export function usePharmacyScreen() { ... }
+
+/** Valida que el archivo sea una imagen con magic bytes válidos. */
+async function validateImageMagicBytes(file: File) { ... }
+```
+
+**No escribas** lo que el código ya dice. Sólo documenta el **POR QUÉ** cuando no sea obvio:
+
+```typescript
+// ❌ Obvio
+/** Incrementa count en 1 */
+function incrementCount() { count++; }
+
+// ✅ Necesario
+/** Espera 100ms antes de mostrar el loader, evitando parpadeo en cargas rápidas. */
+setTimeout(() => setLoading(true), 100);
+```
+
+### Sin comentarios de explicación
+
+El código bien nombrado **no necesita comentarios internos**:
+
+```typescript
+// ❌ Malo
+const r = items.filter(x => x.d > 0);  // d = deleted, filtro items no borrados
+
+// ✅ Bueno
+const activeItems = items.filter(item => !item.isDeleted);
+```
+
+## Internacionalización
+
+### Móvil: `useLanguage()`, nunca strings sueltos
+
+```typescript
+// ❌ Prohibido
+<Text>Hola mundo</Text>
+
+// ✅ Obligatorio
+const { t } = useLanguage();
+<AppText>{t.home.greeting}</AppText>
+```
+
+Las traducciones viven en `i18n/translations.ts` y `locales/{es,eu,en}.json`.
+
+### Backend: campos multiidioma
+
+Losgr documentos se guardan con campos por idioma:
+
+```typescript
+// Documento Mongo
+Comercio {
+  _id: ObjectId,
+  nombre_es: 'Panadería Martín',
+  nombre_eu: 'Martinen Ogin-zeaketa',
+  nombre_en: 'Martin\'s Bakery',
+  ...
+}
+```
+
+## Migración a convenciones
+
+### Hex crudos en componentes
+
+Cualquier hex crudo (`#133212`, `#A0F981`, etc.) debe reemplazarse por el token correspondiente de `AppColors`. Esto es un trabajo en curso.
+
+### Componentes >200 líneas
+
+Si encuentras un componente grande, conviértelo en piezas más pequeñas.
+
+---
+
+**Ver también:** [Arquitectura de la app](/arquitectura/app) · [Sistema de diseño](/diseno/sistema-de-diseno) · [AGENTS.md](https://github.com/adimenai/Herrikonekt/blob/main/AGENTS.md)

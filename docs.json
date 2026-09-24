@@ -63,7 +63,8 @@
               "arquitectura/app",
               "arquitectura/backend",
               "arquitectura/idioma",
-              "arquitectura/sincronizacion"
+              "arquitectura/sincronizacion",
+              "arquitectura/convenciones"
             ]
           },
           {
