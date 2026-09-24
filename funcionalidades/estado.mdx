@@ -5,7 +5,7 @@ description: "Resumen transversal de qué funcionalidades de Herrikonekt están 
 icon: "list-check"
 ---
 
-Resumen del estado actual de la plataforma completa Herrikonekt (app móvil, backend, dashboard y base de datos).
+Resumen del estado actual de la plataforma completa Herrikonekt (app móvil, backend, dashboard y base de datos). Actualizado a septiembre 2026.
 
 ## Repositorios y estado general
 
@@ -18,13 +18,13 @@ Resumen del estado actual de la plataforma completa Herrikonekt (app móvil, bac
 
 ## Funcionalidades por categoría
 
-### ✅ Completadas (18)
+### ✅ Completadas (20)
 
 | Funcionalidad | Descripción | Plataforma |
 | --- | --- | --- |
 | Directorio de comercios | Buscador, tipos, listado paginado y cacheado | App + Backend |
 | Ficha de comercio | Horario, contacto, fotos, descripción multiidioma, servicios, distintivo premium | App + Backend |
-| Mapa del comercio | Botón "Cómo llegar" (Apple/Google Maps) | App + Backend |
+| Mapa del comercio | Botón "Cómo llegar" (Apple/Google Maps) con geolocalización | App + Backend |
 | Anuncios y ofertas | Carrusel en Inicio, filtrado por municipio | App + Backend |
 | Comercio destacado (premium) | Distintivo visual dorado, sin pago en app | App + Backend |
 | Favoritos (trébol) | Marcar/desmarcar ilimitado, sincronización por servidor | App + Backend |
@@ -38,6 +38,8 @@ Resumen del estado actual de la plataforma completa Herrikonekt (app móvil, bac
 | Notificaciones del foro | Push de respuestas, marcar leídas, badge en Perfil | App + Backend |
 | Perfil y cuenta | Registro/login (email, Apple, Google en Android), edición, opt-out analítica | App + Backend |
 | Cerrar sesión | Fila propia en Perfil con confirmación | App + Backend |
+| **Gasolineras** ⛽ | Precios en tiempo real por municipio, filtro por combustible, orden por precio/distancia | App + Backend |
+| **Transporte público** 🚌 | Búsqueda de rutas (desde/hasta), horarios, paradas, detalles de viaje | App + Backend |
 | Rendimiento de listados | Virtualización, memoización, caché de thumbnails, splash nativo | App |
 | Módulos nativos preinstalados | `expo-camera`, `expo-document-picker`, `expo-sharing` listos para uso futuro | App |
 
@@ -50,7 +52,7 @@ Resumen del estado actual de la plataforma completa Herrikonekt (app móvil, bac
 | Build EAS nativo | Validación en dispositivo (necesario para `expo-calendar`) | Medio |
 | Rendimiento general | Recorrido de verificación en dispositivo | Medio |
 
-### 🔴 Pendientes (3)
+### 🔴 Pendientes (5)
 
 | Funcionalidad | Situación | Repositorio |
 | --- | --- | --- |
@@ -64,11 +66,9 @@ Resumen del estado actual de la plataforma completa Herrikonekt (app móvil, bac
 
 ## Funcionalidades futuras
 
-Documentadas en la sección **Funcionalidades futuras** pero aún no planificadas:
+En evaluación o ideación (prioritización pendiente):
 
-- **Gasolineras** — Mostrar precio de gasolineras cercanas con filtro por carburante.
 - **Playas y mareas** — Bandera de baño, tabla de mareas, condiciones del mar.
-- **Transporte público** — Próximos pasos de autobús/tren, líneas disponibles (datos GTFS).
 - **Loterías** — Resultados de Euromillones, Primitiva, Bonoloto, El Gordo, etc.
 - **Turismo y rutas** — Catálogo comunitario de rutas y sitios de interés (miradores, cascadas, cimas).
 
@@ -113,7 +113,7 @@ Documentadas en la sección **Funcionalidades futuras** pero aún no planificada
 3. **Integración de Tréboles** — Servidor listo; falta conectar en la app (opt-in + límite diario).
 4. **Monetización** — Decisión de modelo de negocio y flujos de pago in-app.
 5. **Panel de comercios** — Scaffolding hecho; falta implementar edición, ofertas, anuncios de pago.
-6. **Funcionalidades futuras** — Evaluación de viabilidad y priorización (gasolineras, playas, transporte, etc.).
+6. **Funcionalidades futuras** — Evaluación de viabilidad y priorización (playas, loterías, turismo, etc.).
 
 ## Recursos y documentación
 
