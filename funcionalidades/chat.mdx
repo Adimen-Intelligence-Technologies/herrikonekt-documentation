@@ -1,0 +1,69 @@
+---
+title: "Chat privado"
+sidebarTitle: "Chat privado"
+description: "Mensajes privados 1 a 1 entre vecinos a partir de un anuncio del foro (compra-venta, empleo o coche compartido): bandeja, conversación, avisos, bloqueo, reporte, moderación y extracción legal."
+icon: "message"
+---
+
+El **chat privado** permite escribir en privado al autor de un anuncio del [foro](/funcionalidades/foro) sin compartir datos personales: las personas se ven entre sí **solo por su alias de foro**, nunca por su nombre, correo o teléfono.
+
+## Qué puedes hacer
+
+### Contactar desde un anuncio
+
+- En un anuncio de **Compra/Venta**, **Empleo** o **Coche compartido** que no es tuyo aparece el botón **Contactar**. Escribes el primer mensaje y se abre la conversación.
+- Si ya has hablado antes con esa persona, en lugar de **Contactar** aparece **Ya has hablado con el autor de este anuncio · Ir al chat**.
+- Si el autor ha desactivado los mensajes, aparece **Este anuncio ya no acepta mensajes** (las conversaciones ya abiertas siguen funcionando).
+- Sin sesión, al pulsar **Contactar** la app te lleva al login.
+
+### Conversar
+
+- **Mis mensajes** está en la cabecera del foro y en el menú de **Perfil**, con un contador de mensajes sin leer.
+- La conversación muestra los mensajes con su hora, **separadores de día** ("Hoy", "Ayer", el día de la semana o la fecha) y una franja **N mensajes sin leer** al abrirla.
+- Cada mensaje enviado indica su estado: enviándose, enviado (✓), entregado (✓✓ gris) y leído (✓✓ de color). Si falla, se puede reintentar o descartar.
+- Si un mensaje se escribió desde un anuncio, lleva una cabecera con el título del anuncio que lo abre.
+- Desde **⋮** puedes **bloquear** (la otra persona ya no puede escribirte) o **reportar** la conversación.
+
+### Si eres el autor del anuncio
+
+- Interruptor **Recibir mensajes** en tu anuncio: desactívalo cuando ya no quieras que te escriban por él (por ejemplo, ya vendido).
+- Sección **Mensajes privados (N)** en tu anuncio con las personas que te han escrito desde él y acceso a cada conversación.
+
+## Cómo funciona
+
+- **Una conversación por pareja de usuarios**: aunque contactes por varios anuncios con la misma persona, es siempre la misma conversación (cada mensaje lleva el anuncio desde el que se escribió).
+- El chat **solo se inicia desde un anuncio**; no hay buscador de usuarios ni se puede abrir con quien solo respondió en público.
+- **Avisos**:
+  - **Push** con cada mensaje nuevo (como mucho uno por conversación cada 60 segundos).
+  - **Campana de notificaciones** solo la primera vez que alguien te escribe; los siguientes mensajes se ven en el chat.
+- **Actualización**: la app consulta mensajes nuevos cada pocos segundos con la conversación abierta (3 a 15 s) y cada 8 s en la bandeja; en segundo plano no consulta.
+- **Límites**: mensajes de 1 a 2.000 caracteres, 30 mensajes por minuto y 20 conversaciones nuevas al día por usuario.
+- **Conservación**: los mensajes no se pueden borrar. Si una cuenta se elimina, sus conversaciones se conservan y la otra persona la ve como **Usuario eliminado**, sin poder escribirle. Ver la ficha legal en el repositorio del servidor (`openspec/changes/chat-privado/legal-dpo.md`).
+
+## Administración
+
+En el panel (`/admin`), grupo **Chat**:
+
+- **Reportes**: reportes de conversaciones con el motivo y una copia de los últimos 20 mensajes (identificados por alias). El moderador no ve el resto de la conversación. Se marcan como revisados, descartados o se reabren.
+- **Extracciones legales**: vía excepcional para atender un requerimiento de una autoridad. Exige solicitante, referencia y motivo; devuelve la conversación completa con los datos reales de los participantes en **PDF** o **JSON**, con una huella SHA-256 y la fecha hasta la que hay que conservar los datos (baja + 5 años, variable `CHAT_RETENCION_ANOS`). Cada extracción queda en un registro que no caduca.
+
+## Detalles técnicos
+
+| Pieza | Dónde |
+| --- | --- |
+| API del chat | `/api/chat/conversaciones`, `/api/chat/conversaciones/{id}/mensajes`, `…/leido`, `…/bloqueo`, `…/reporte`, `/api/chat/no-leidos` |
+| Desde el anuncio | `GET` y `PATCH /api/forum/posts/{id}/contacto` (conversación existente / activar contacto), `GET /api/forum/posts/{id}/chats` (solo el autor) |
+| Administración | `/api/chat/reportes`, `/api/chat/extracciones`, `/api/chat/extracciones/conversaciones` (solo `admin`) |
+| Colecciones | `chatConversaciones`, `chatMensajes`, `chatBloqueos`, `chatReportes`, `chatAccesosLegales` (sin TTL) |
+| App | Pantallas `app/chat/index.tsx` y `app/chat/[id].tsx`, slice `chat` del store, transporte por polling en `lib/chat/transport.ts` (sustituible por tiempo real) |
+| Especificación | Cambio OpenSpec `chat-privado` en el servidor (proposal, design, spec y tasks) |
+
+## Estado
+
+<Note>
+  **Listo**: contactar desde anuncios, bandeja y conversación, estados de envío, separadores de día y no leídos, push y aviso de primer contacto, bloqueo, reporte, interruptor del autor, mensajes privados del anuncio, moderación de reportes y extracción legal. Probado en Android.
+</Note>
+
+<Warning>
+  **Pendiente**: validación legal (plazo de conservación, contenido del push, política de privacidad y términos), push en la build Android de pruebas, prueba en iOS, borrado de cuenta desde la app, borrado de los datos al cumplir el plazo, exportación de mensajes para el usuario y revisión nativa del euskera.
+</Warning>
