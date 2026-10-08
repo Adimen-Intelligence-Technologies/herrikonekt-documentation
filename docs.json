@@ -37,6 +37,7 @@
               "funcionalidades/esquelas",
               "funcionalidades/taxis",
               "funcionalidades/foro",
+              "funcionalidades/chat",
               "funcionalidades/perfil",
               "funcionalidades/notificaciones"
             ]
